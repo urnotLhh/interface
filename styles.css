@@ -15,7 +15,7 @@
 }
 
 html {
-  font-size: clamp(12px, 0.95vw, 15px);
+  font-size: clamp(13px, 1.1vw, 16px);
 }
 
 * {
@@ -31,18 +31,18 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  --page-padding: clamp(0.5rem, 2vw, 1rem);
+  --page-padding: clamp(0.75rem, 2.5vw, 1.25rem);
   padding: var(--page-padding);
 }
 
 .page-wrapper {
-  width: min(100%, 1500px, calc((100vh - 2 * var(--page-padding)) * (16 / 9)));
+  width: min(100%, 1600px, calc((100vh - 2 * var(--page-padding)) * (16 / 9)));
   max-height: calc(100vh - 2 * var(--page-padding));
   aspect-ratio: 16 / 9;
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
-  padding: 0.95rem 1.05rem;
+  gap: 1.25rem;
+  padding: 1.25rem;
   overflow: hidden;
 }
 
