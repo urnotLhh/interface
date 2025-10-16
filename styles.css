@@ -29,15 +29,16 @@ body {
 }
 
 main {
-  width: min(1280px, 92vw);
-  margin: 0 auto 4rem auto;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+  width: min(1320px, 96vw);
+  margin: 0 auto 3rem auto;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1.5rem;
+  align-items: start;
 }
 
 .page-header {
-  width: min(1280px, 92vw);
+  width: min(1320px, 96vw);
   margin: 2.5rem auto 1.5rem auto;
   display: flex;
   align-items: center;
@@ -143,6 +144,10 @@ main {
   font-size: 0.95rem;
 }
 
+.assessment-card {
+  grid-column: span 7;
+}
+
 .assessment-card .assessment-content {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
@@ -222,20 +227,22 @@ main {
 }
 
 .grid-layout {
+  grid-column: span 5;
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 1.75rem;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 1.25rem;
 }
 
 .grid-layout > .card {
-  grid-column: span 6;
+  grid-column: span 3;
   min-height: 100%;
 }
 
 .split-panels {
+  grid-column: span 7;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 1.75rem;
+  gap: 1.25rem;
 }
 
 .split-panels > .card {
@@ -248,12 +255,20 @@ main {
 }
 
 .split-panels > .card .description {
-  max-width: 30rem;
+  max-width: 28rem;
 }
 
 .split-panels .placeholder,
 .grid-layout .placeholder {
-  min-height: 160px;
+  min-height: 150px;
+}
+
+.neo4j-card {
+  grid-column: span 5;
+}
+
+.neo4j-card .neo4j-preview {
+  min-height: 260px;
 }
 
 .stats-grid {
@@ -738,7 +753,60 @@ button:disabled {
   font-size: 0.9rem;
 }
 
+@media (max-width: 1200px) {
+  main {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .assessment-card,
+  .split-panels,
+  .grid-layout,
+  .neo4j-card {
+    grid-column: span 6;
+  }
+
+  .grid-layout {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .grid-layout > .card {
+    grid-column: span 6;
+  }
+}
+
 @media (max-width: 768px) {
+  main {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .assessment-card,
+  .grid-layout,
+  .split-panels,
+  .neo4j-card {
+    grid-column: span 1;
+  }
+
+  .assessment-card .assessment-content {
+    grid-template-columns: 1fr;
+  }
+
+  .grid-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .grid-layout > .card {
+    grid-column: span 1;
+  }
+
+  .split-panels {
+    grid-template-columns: 1fr;
+  }
+
+  .split-panels > .card {
+    grid-column: span 1;
+  }
+
   .page-header {
     flex-direction: column;
     align-items: flex-start;
