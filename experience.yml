@@ -1,0 +1,9 @@
+version: 1
+project: 漏洞评估平台前端界面
+steps:
+  - name: 安装依赖
+    command: npm install
+    description: 安装 Express、Multer 等运行示例服务所需的依赖。
+  - name: 启动演示服务
+    command: npm start
+    description: 在本地端口 5173 启动前端页面和演示 API。
