@@ -7,156 +7,198 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="page-header">
-      <div class="branding">
-        <h1>综合漏洞评估平台</h1>
-        <p class="subtitle">IP扫描 · 指纹收集 · 设备识别 · 漏洞评估</p>
-      </div>
-      <div class="status-panel" id="statusPanel">
-        <span class="status-dot" aria-hidden="true"></span>
-        <span id="statusText">等待操作</span>
-      </div>
-    </header>
-
-    <main>
-      <section class="card assessment-card" aria-labelledby="ip-input-title">
-        <div class="card-header">
-          <div>
-            <h2 id="ip-input-title">目标 IP 评估</h2>
-            <p class="description">
-              通过上传单个 IP、子网段或 IP 列表文件触发自动化扫描、指纹收集与设备识别，
-              并生成相应的统计视图。
-            </p>
-          </div>
+    <div class="layout-frame">
+      <header class="page-header">
+        <div class="branding">
+          <h1>综合漏洞评估平台</h1>
+          <p class="subtitle">IP扫描 · 指纹收集 · 设备识别 · 漏洞评估</p>
         </div>
-        <div class="assessment-content">
-          <div class="assessment-main">
-            <form
-              id="assessmentForm"
-              class="assessment-form"
-              autocomplete="off"
-              enctype="multipart/form-data"
-            >
-              <fieldset class="mode-selector">
-                <legend class="visually-hidden">选择评估方式</legend>
-                <label class="mode-option">
-                  <input
-                    type="radio"
-                    name="assessmentMode"
-                    value="single"
-                    checked
-                  />
-                  单个 IP
-                </label>
-                <label class="mode-option">
-                  <input type="radio" name="assessmentMode" value="subnet" />
-                  子网 + 掩码
-                </label>
-                <label class="mode-option">
-                  <input type="radio" name="assessmentMode" value="file" />
-                  上传文件
-                </label>
-              </fieldset>
-              <div class="mode-panels">
-                <div class="mode-panel" data-mode-panel="single">
-                  <label for="targetIp">目标 IP 地址</label>
-                  <input
-                    type="text"
-                    id="targetIp"
-                    name="targetIp"
-                    placeholder="例如：192.168.1.10"
-                    required
-                    pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
-                  />
-                </div>
-                <div class="mode-panel" data-mode-panel="subnet" hidden>
-                  <label for="targetSubnet">子网地址</label>
-                  <input
-                    type="text"
-                    id="targetSubnet"
-                    name="targetSubnet"
-                    placeholder="例如：10.0.0.0"
-                    required
-                    pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
-                  />
-                  <label for="targetMask">掩码 / 前缀</label>
-                  <input
-                    type="text"
-                    id="targetMask"
-                    name="targetMask"
-                    placeholder="255.255.255.0 或 24"
-                    required
-                    pattern="^(([0-9]{1,3}\.){3}[0-9]{1,3})$|^([0-9]|[12][0-9]|3[0-2])$"
-                  />
-                  <small class="muted">
-                    支持传统掩码或 CIDR 前缀格式，示例：<code>192.168.10.0 / 24</code>
-                  </small>
-                </div>
-                <div class="mode-panel" data-mode-panel="file" hidden>
-                  <label for="targetFile">上传 IP 列表文件</label>
-                  <input
-                    type="file"
-                    id="targetFile"
-                    name="targetsFile"
-                    accept=".txt,.csv"
-                    required
-                  />
-                  <small class="muted">
-                    每行或以逗号分隔一个 IP / 子网，可自动跳过空行。
-                  </small>
-                </div>
-              </div>
-              <div class="form-actions">
-                <button type="submit" class="primary">开始评估</button>
-              </div>
-            </form>
-            <div class="assessment-actions">
-              <label class="switch">
-                <input type="checkbox" id="mockToggle" checked />
-                <span class="slider" aria-hidden="true"></span>
-                <span class="switch-text">使用演示数据</span>
-              </label>
-              <button type="button" id="resetButton" class="ghost">
-                清空结果
-              </button>
-            </div>
-          </div>
-          <aside
-            id="assessmentSummary"
-            class="assessment-summary placeholder"
-            aria-live="polite"
-          >
-            尚未开始评估
-          </aside>
+        <div class="status-panel" id="statusPanel">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="statusText">等待操作</span>
         </div>
-      </section>
+      </header>
 
-      <section class="grid-layout">
-        <article class="card" aria-labelledby="scan-overview-title">
-          <h3 id="scan-overview-title">IP 扫描概览</h3>
-          <div id="scanResults" class="placeholder">尚未开始扫描</div>
-        </article>
-        <article class="card" aria-labelledby="fingerprint-title">
-          <h3 id="fingerprint-title">指纹收集</h3>
-          <div id="fingerprintResults" class="placeholder">暂无数据</div>
-        </article>
-        <article class="card" aria-labelledby="device-recognition-title">
-          <h3 id="device-recognition-title">设备识别</h3>
-          <div id="deviceRecognition" class="placeholder">等待识别结果</div>
-        </article>
-        <article class="card" aria-labelledby="statistics-title">
-          <h3 id="statistics-title">统计信息</h3>
-          <div id="statistics" class="placeholder stats-grid">暂无统计数据</div>
-        </article>
-      </section>
-
-      <div class="split-panels">
-        <section class="card" aria-labelledby="vuln-search-title">
+      <main class="dashboard-grid">
+        <section
+          class="card ip-assessment"
+          aria-labelledby="ip-input-title"
+        >
           <div class="card-header">
             <div>
-              <h2 id="vuln-search-title">漏洞检索</h2>
+              <h2 id="ip-input-title">目标 IP 评估</h2>
               <p class="description">
-                从 Neo4j 或其他后端数据源查询与设备类型关联的 CVE 漏洞，支持单个或多个设备类型。输入以逗号或换行分隔的设备类型。
+                上传单个 IP、子网段或 IP 列表，快速触发扫描与识别任务，并实时查看执行概况。
+              </p>
+            </div>
+          </div>
+          <div class="assessment-content">
+            <div class="assessment-main">
+              <form
+                id="assessmentForm"
+                class="assessment-form"
+                autocomplete="off"
+                enctype="multipart/form-data"
+              >
+                <fieldset class="mode-selector">
+                  <legend class="visually-hidden">选择评估方式</legend>
+                  <label class="mode-option">
+                    <input
+                      type="radio"
+                      name="assessmentMode"
+                      value="single"
+                      checked
+                    />
+                    单个 IP
+                  </label>
+                  <label class="mode-option">
+                    <input type="radio" name="assessmentMode" value="subnet" />
+                    子网 + 掩码
+                  </label>
+                  <label class="mode-option">
+                    <input type="radio" name="assessmentMode" value="file" />
+                    上传文件
+                  </label>
+                </fieldset>
+                <div class="mode-panels">
+                  <div class="mode-panel" data-mode-panel="single">
+                    <label for="targetIp">目标 IP 地址</label>
+                    <input
+                      type="text"
+                      id="targetIp"
+                      name="targetIp"
+                      placeholder="例如：192.168.1.10"
+                      required
+                      pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
+                    />
+                  </div>
+                  <div class="mode-panel" data-mode-panel="subnet" hidden>
+                    <label for="targetSubnet">子网地址</label>
+                    <input
+                      type="text"
+                      id="targetSubnet"
+                      name="targetSubnet"
+                      placeholder="例如：10.0.0.0"
+                      required
+                      pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
+                    />
+                    <label for="targetMask">掩码 / 前缀</label>
+                    <input
+                      type="text"
+                      id="targetMask"
+                      name="targetMask"
+                      placeholder="255.255.255.0 或 24"
+                      required
+                      pattern="^(([0-9]{1,3}\.){3}[0-9]{1,3})$|^([0-9]|[12][0-9]|3[0-2])$"
+                    />
+                    <small class="muted">
+                      支持传统掩码或 CIDR 前缀格式，示例：<code>192.168.10.0 / 24</code>
+                    </small>
+                  </div>
+                  <div class="mode-panel" data-mode-panel="file" hidden>
+                    <label for="targetFile">上传 IP 列表文件</label>
+                    <input
+                      type="file"
+                      id="targetFile"
+                      name="targetsFile"
+                      accept=".txt,.csv"
+                      required
+                    />
+                    <small class="muted">
+                      每行或以逗号分隔一个 IP / 子网，可自动跳过空行。
+                    </small>
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="primary">开始评估</button>
+                  <button type="button" id="resetButton" class="ghost">
+                    清空结果
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="card device-stats"
+          aria-labelledby="device-stats-title"
+        >
+          <h2 id="device-stats-title">设备类型统计</h2>
+          <p class="description">
+            汇总识别结果与关键指标，帮助快速了解网络资产构成与暴露面。
+          </p>
+          <div class="stacked-panels">
+            <div class="sub-card">
+              <h3 id="device-recognition-title">设备识别</h3>
+              <div id="deviceRecognition" class="placeholder">
+                等待识别结果
+              </div>
+            </div>
+            <div class="sub-card">
+              <h3 id="statistics-title">统计信息</h3>
+              <div id="statistics" class="placeholder stats-grid">
+                暂无统计数据
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card ip-scan" aria-labelledby="scan-overview-title">
+          <h2 id="scan-overview-title">IP 扫描结果览</h2>
+          <p class="description">
+            查看端口开放情况，追踪扫描任务的进度与产出。
+          </p>
+          <div class="stacked-panels">
+            <div class="sub-card">
+              <h3>扫描概览</h3>
+              <div id="scanResults" class="placeholder">尚未开始扫描</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card neo4j-panel" aria-labelledby="neo4j-title">
+          <div class="card-header">
+            <div>
+              <h2 id="neo4j-title">Neo4j 图数据库</h2>
+              <p class="description">
+                嵌入 Neo4j 控制台或上传示例图，快速呈现资产之间的关联关系。
+              </p>
+            </div>
+          </div>
+          <div class="neo4j-controls">
+            <label>
+              <input type="radio" name="neo4jMode" value="embed" checked />
+              嵌入 Neo4j 页面
+            </label>
+            <label>
+              <input type="radio" name="neo4jMode" value="image" />
+              使用示例图片
+            </label>
+          </div>
+          <div class="neo4j-config">
+            <label for="neo4jUrl">Neo4j URL</label>
+            <input
+              type="url"
+              id="neo4jUrl"
+              placeholder="http://localhost:7474/browser/"
+              value="http://localhost:7474/browser/"
+            />
+            <label for="neo4jImage" class="upload-label">选择示例图片</label>
+            <input type="file" id="neo4jImage" accept="image/*" />
+          </div>
+          <div id="neo4jPreview" class="neo4j-preview placeholder">
+            当前处于嵌入模式，如需展示请确保浏览器允许访问
+            <code>http://localhost:7474</code>
+          </div>
+        </section>
+
+        <section class="card vuln-panel" aria-labelledby="vuln-search-title">
+          <div class="card-header">
+            <div>
+              <h2 id="vuln-search-title">漏洞评估结果</h2>
+              <p class="description">
+                根据识别到的设备类型检索 CVE 漏洞，并输出关联的 CPE 映射分析。
               </p>
             </div>
             <button
@@ -181,58 +223,24 @@
               <span id="vulnTime" class="muted"></span>
             </div>
           </form>
-          <div id="vulnerabilityResults" class="table-wrapper placeholder">
-            尚未发起漏洞检索
+          <div class="vuln-results-grid">
+            <div id="vulnerabilityResults" class="table-wrapper placeholder">
+              尚未发起漏洞检索
+            </div>
+            <div class="sub-card">
+              <h3 id="analysis-title">CPE 映射分析</h3>
+              <div id="analysisResults" class="placeholder">
+                待输出关联结果
+              </div>
+            </div>
           </div>
         </section>
+      </main>
 
-        <section class="card" aria-labelledby="analysis-title">
-          <h2 id="analysis-title">漏洞分析（设备类型 - CPE 映射）</h2>
-          <div id="analysisResults" class="placeholder">
-            待输出关联结果
-          </div>
-        </section>
-      </div>
-
-      <section class="card neo4j-card" aria-labelledby="neo4j-title">
-        <div class="card-header">
-          <div>
-            <h2 id="neo4j-title">Neo4j 图谱展示</h2>
-            <p class="description">
-              支持直接嵌入本地 Neo4j 7474 控制台，或上传示例图像作为案例展示。
-            </p>
-          </div>
-          <div class="neo4j-controls">
-            <label>
-              <input type="radio" name="neo4jMode" value="embed" checked />
-              嵌入 Neo4j 页面
-            </label>
-            <label>
-              <input type="radio" name="neo4jMode" value="image" />
-              使用示例图片
-            </label>
-          </div>
-        </div>
-        <div class="neo4j-config">
-          <label for="neo4jUrl">Neo4j URL</label>
-          <input
-            type="url"
-            id="neo4jUrl"
-            placeholder="http://localhost:7474/browser/"
-            value="http://localhost:7474/browser/"
-          />
-          <label for="neo4jImage" class="upload-label">选择示例图片</label>
-          <input type="file" id="neo4jImage" accept="image/*" />
-        </div>
-        <div id="neo4jPreview" class="neo4j-preview placeholder">
-          当前处于嵌入模式，如需展示请确保浏览器允许访问 <code>http://localhost:7474</code>
-        </div>
-      </section>
-    </main>
-
-    <footer class="page-footer">
-      <small>© 2024 漏洞评估平台 · 前端界面原型</small>
-    </footer>
+      <footer class="page-footer">
+        <small>© 2024 漏洞评估平台 · 前端界面原型</small>
+      </footer>
+    </div>
 
     <script src="app.js" type="module"></script>
   </body>

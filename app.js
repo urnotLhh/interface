@@ -1,7 +1,6 @@
 const statusPanel = document.getElementById("statusPanel");
 const statusText = document.getElementById("statusText");
 const scanResults = document.getElementById("scanResults");
-const fingerprintResults = document.getElementById("fingerprintResults");
 const deviceRecognition = document.getElementById("deviceRecognition");
 const statistics = document.getElementById("statistics");
 const vulnerabilityResults = document.getElementById("vulnerabilityResults");
@@ -12,13 +11,14 @@ const neo4jUrlInput = document.getElementById("neo4jUrl");
 const neo4jImageInput = document.getElementById("neo4jImage");
 const vulnTime = document.getElementById("vulnTime");
 const assessmentForm = document.getElementById("assessmentForm");
-const assessmentSummary = document.getElementById("assessmentSummary");
 const assessmentModeInputs = document.querySelectorAll('input[name="assessmentMode"]');
 const assessmentPanels = document.querySelectorAll("[data-mode-panel]");
 const targetIpInput = document.getElementById("targetIp");
 const targetSubnetInput = document.getElementById("targetSubnet");
 const targetMaskInput = document.getElementById("targetMask");
 const targetFileInput = document.getElementById("targetFile");
+
+const USE_MOCK_DATA = true;
 
 const mockData = {
   ip: "192.168.1.10",
@@ -141,16 +141,6 @@ function setAssessmentMode(mode) {
   });
 }
 
-function getModeLabel(mode) {
-  return (
-    {
-      single: "单个 IP",
-      subnet: "子网 + 掩码",
-      file: "文件上传",
-    }[mode] ?? mode
-  );
-}
-
 function buildSummaryFromInputs(mode) {
   if (mode === "file") {
     const file = targetFileInput?.files?.[0];
@@ -265,52 +255,6 @@ function renderStatistics(stats) {
   });
 
   statistics.appendChild(fragment);
-}
-
-function renderAssessmentSummary(summary) {
-  if (!summary) {
-    assessmentSummary.textContent = "尚未开始评估";
-    assessmentSummary.classList.add("placeholder");
-    return;
-  }
-
-  assessmentSummary.classList.remove("placeholder");
-
-  const fragments = [];
-  fragments.push(
-    `<p><strong>输入方式：</strong>${getModeLabel(summary.mode)}</p>`
-  );
-
-  if (summary.label) {
-    fragments.push(
-      `<p><strong>目标范围：</strong>${summary.label}</p>`
-    );
-  }
-
-  if (typeof summary.totalTargets === "number" && summary.totalTargets > 0) {
-    fragments.push(
-      `<p><strong>目标数量：</strong>${summary.totalTargets}</p>`
-    );
-  }
-
-  const preview = summary.targetsPreview ?? summary.preview ?? [];
-  if (preview.length > 0) {
-    const extra =
-      summary.totalTargets && summary.totalTargets > preview.length
-        ? `（共 ${summary.totalTargets} 项）`
-        : "";
-    fragments.push(
-      `<div class="summary-preview"><strong>样本：</strong><span>${preview
-        .slice(0, 5)
-        .join("、")}${extra}</span></div>`
-    );
-  }
-
-  if (summary.message) {
-    fragments.push(`<p class="muted">${summary.message}</p>`);
-  }
-
-  assessmentSummary.innerHTML = fragments.join("");
 }
 
 function renderVulnerabilities(vulnerabilities) {
@@ -591,18 +535,7 @@ async function extractError(response) {
 }
 
 function renderAssessment(data) {
-  renderAssessmentSummary(data?.summary);
   renderList(scanResults, data?.scan?.overview);
-
-  const fingerprintItems = [...(data?.fingerprint?.technologies ?? [])];
-  if (data?.fingerprint?.os) {
-    fingerprintItems.unshift({
-      title: "操作系统",
-      status: data.fingerprint.os,
-    });
-  }
-  renderList(fingerprintResults, fingerprintItems);
-
   renderRecognition(data?.recognition);
   renderStatistics(data?.scan?.statistics);
 }
@@ -671,13 +604,9 @@ function resetDashboard() {
     targetFileInput.value = "";
   }
   setAssessmentMode("single");
-  renderAssessmentSummary(null);
 
   scanResults.innerHTML = "尚未开始扫描";
   scanResults.classList.add("placeholder");
-
-  fingerprintResults.innerHTML = "暂无数据";
-  fingerprintResults.classList.add("placeholder");
 
   deviceRecognition.innerHTML = "等待识别结果";
   deviceRecognition.classList.add("placeholder");
@@ -695,7 +624,8 @@ function resetDashboard() {
 
   vulnTime.textContent = "";
   document.getElementById("deviceTypes").value = "";
-  updateStatus("ready", "等待操作");
+  const initialStatus = USE_MOCK_DATA ? "等待操作（演示模式）" : "等待操作";
+  updateStatus("ready", initialStatus);
 }
 
 function handleNeo4jModeChange(mode) {
@@ -748,8 +678,7 @@ function initEventListeners() {
       return;
     }
     const mode = getActiveAssessmentMode();
-    const useMock = document.getElementById("mockToggle").checked;
-    performAssessment(mode, useMock);
+    performAssessment(mode, USE_MOCK_DATA);
   });
 
   assessmentModeInputs.forEach((input) => {
@@ -759,16 +688,7 @@ function initEventListeners() {
   document.getElementById("vulnForm").addEventListener("submit", (event) => {
     event.preventDefault();
     const deviceTypes = event.target.deviceTypes.value;
-    const useMock = document.getElementById("mockToggle").checked;
-    handleVulnerabilitySearch(deviceTypes, useMock);
-  });
-
-  document.getElementById("mockToggle").addEventListener("change", (event) => {
-    if (!event.target.checked) {
-      updateStatus("ready", "已切换到真实数据模式，请确保后端接口可用");
-    } else {
-      updateStatus("ready", "已切换到演示模式");
-    }
+    handleVulnerabilitySearch(deviceTypes, USE_MOCK_DATA);
   });
 
   document.getElementById("resetButton").addEventListener("click", resetDashboard);
