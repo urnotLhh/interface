@@ -1,7 +1,6 @@
 const statusPanel = document.getElementById("statusPanel");
 const statusText = document.getElementById("statusText");
 const deviceRecognition = document.getElementById("deviceRecognition");
-const statistics = document.getElementById("statistics");
 const vulnerabilityResults = document.getElementById("vulnerabilityResults");
 const analysisResults = document.getElementById("analysisResults");
 const useRecognizedDevices = document.getElementById("useRecognizedDevices");
@@ -21,19 +20,6 @@ const USE_MOCK_DATA = true;
 
 const mockData = {
   ip: "192.168.1.10",
-  scan: {
-    overview: [
-      { title: "端口 22", status: "开放", service: "OpenSSH 8.4" },
-      { title: "端口 80", status: "开放", service: "nginx 1.22" },
-      { title: "端口 502", status: "开放", service: "Modbus/TCP" },
-    ],
-    statistics: [
-      { label: "开放端口", value: 6 },
-      { label: "TCP 服务", value: 4 },
-      { label: "UDP 服务", value: 2 },
-      { label: "最近扫描", value: "2024-05-22 14:23" },
-    ],
-  },
   fingerprint: {
     technologies: [
       { name: "OpenSSH", version: "8.4p1", category: "远程管理" },
@@ -178,35 +164,6 @@ function updateStatus(state, message) {
   statusPanel.classList.remove("ready", "loading", "error");
   statusPanel.classList.add(state);
   statusText.textContent = message;
-}
-
-function renderStatistics(stats) {
-  if (!stats || stats.length === 0) {
-    statistics.innerHTML = '<div class="placeholder">暂无统计数据</div>';
-    return;
-  }
-
-  const fragment = document.createDocumentFragment();
-  statistics.classList.remove("placeholder");
-  statistics.innerHTML = "";
-
-  stats.forEach((stat) => {
-    const card = document.createElement("div");
-    card.className = "stat-card";
-
-    const label = document.createElement("h4");
-    label.textContent = stat.label;
-    card.appendChild(label);
-
-    const value = document.createElement("div");
-    value.className = "stat-value";
-    value.textContent = stat.value;
-    card.appendChild(value);
-
-    fragment.appendChild(card);
-  });
-
-  statistics.appendChild(fragment);
 }
 
 function renderVulnerabilities(vulnerabilities) {
@@ -399,16 +356,6 @@ async function performAssessment(mode, useMock) {
           : "演示数据结果",
       };
 
-      if (Array.isArray(data.scan?.statistics)) {
-        data.scan.statistics = [
-          {
-            label: "评估目标",
-            value:
-              summary.totalTargets ?? summary.targetsPreview?.length ?? "-",
-          },
-          ...data.scan.statistics,
-        ];
-      }
     }
 
     renderAssessment(data);
@@ -488,7 +435,6 @@ async function extractError(response) {
 
 function renderAssessment(data) {
   renderRecognition(data?.recognition);
-  renderStatistics(data?.scan?.statistics);
 }
 
 async function handleVulnerabilitySearch(deviceTypes, useMock) {
@@ -560,9 +506,6 @@ function resetDashboard() {
   deviceRecognition.classList.add("placeholder");
   useRecognizedDevices.disabled = true;
   delete useRecognizedDevices.dataset.types;
-
-  statistics.innerHTML = "暂无统计数据";
-  statistics.classList.add("placeholder");
 
   vulnerabilityResults.innerHTML = "尚未发起漏洞检索";
   vulnerabilityResults.classList.add("placeholder");

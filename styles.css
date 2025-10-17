@@ -55,11 +55,11 @@ main {
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: repeat(2, minmax(0, 1fr));
   grid-template-areas:
-    "ip-assessment ip-assessment"
-    "neo4j vuln";
+    "ip-assessment neo4j"
+    "vuln neo4j";
   gap: 0.7rem;
   align-items: stretch;
   flex: 1;
@@ -206,7 +206,7 @@ main {
 
 .assessment-layout {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
   gap: 0.6rem;
   height: 100%;
   align-items: stretch;
@@ -217,17 +217,17 @@ main {
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
-  grid-column: 1;
 }
 
 .assessment-side {
   min-height: 0;
-  display: contents;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 
 .assessment-side .sub-card {
   min-height: 0;
-  height: 100%;
 }
 
 .assessment-side .sub-card > .placeholder {
@@ -302,31 +302,6 @@ main {
   min-height: 150px;
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 0.55rem;
-}
-
-.stat-card {
-  background: #fff;
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  border-radius: 0.7rem;
-  padding: 0.75rem;
-  text-align: left;
-}
-
-.stat-card h4 {
-  margin: 0 0 0.5rem;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-.stat-value {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--primary);
-}
 
 .form-inline {
   display: flex;
@@ -610,10 +585,8 @@ button:disabled {
   }
 
   .assessment-side {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto;
-    grid-auto-rows: minmax(0, auto);
+    display: flex;
+    flex-direction: column;
     gap: 0.6rem;
   }
 
@@ -642,10 +615,8 @@ button:disabled {
   }
 
   .assessment-side {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto;
-    grid-auto-rows: minmax(0, auto);
+    display: flex;
+    flex-direction: column;
     gap: 0.6rem;
   }
 
