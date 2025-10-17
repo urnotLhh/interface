@@ -1,7 +1,5 @@
 const statusPanel = document.getElementById("statusPanel");
 const statusText = document.getElementById("statusText");
-const scanResults = document.getElementById("scanResults");
-const assessmentSummary = document.getElementById("assessmentSummary");
 const deviceRecognition = document.getElementById("deviceRecognition");
 const statistics = document.getElementById("statistics");
 const vulnerabilityResults = document.getElementById("vulnerabilityResults");
@@ -180,129 +178,6 @@ function updateStatus(state, message) {
   statusPanel.classList.remove("ready", "loading", "error");
   statusPanel.classList.add(state);
   statusText.textContent = message;
-}
-
-function renderList(container, items, options = {}) {
-  if (!items || items.length === 0) {
-    container.innerHTML = '<div class="placeholder">暂无数据</div>';
-    container.classList.add("placeholder");
-    return;
-  }
-
-  const list = document.createElement("div");
-  list.className = options.className ?? "list-grid";
-
-  items.forEach((item) => {
-    const card = document.createElement("div");
-    card.className = "list-item";
-
-    if (typeof item === "string") {
-      card.textContent = item;
-    } else {
-      if (item.title || item.name || item.type) {
-        const heading = document.createElement("h4");
-        heading.textContent = item.title ?? item.name ?? item.type;
-        card.appendChild(heading);
-      }
-
-      if (item.status || item.version || item.score) {
-        const sub = document.createElement("p");
-        const parts = [item.status, item.version, item.score && `得分 ${item.score}`].filter(Boolean);
-        sub.textContent = parts.join(" · ");
-        if (parts.length) {
-          card.appendChild(sub);
-        }
-      }
-
-      if (item.service || item.category) {
-        const extra = document.createElement("p");
-        extra.textContent = item.service ?? item.category;
-        card.appendChild(extra);
-      }
-    }
-
-    list.appendChild(card);
-  });
-
-  container.innerHTML = "";
-  container.classList.remove("placeholder");
-  container.appendChild(list);
-}
-
-function renderAssessmentSummary(summary) {
-  if (!assessmentSummary) {
-    return;
-  }
-
-  if (!summary) {
-    assessmentSummary.textContent = "等待评估任务";
-    assessmentSummary.classList.add("placeholder");
-    return;
-  }
-
-  assessmentSummary.classList.remove("placeholder");
-  assessmentSummary.innerHTML = "";
-
-  const panel = document.createElement("div");
-  panel.className = "summary-panel";
-
-  const label = document.createElement("div");
-  label.className = "summary-label";
-  label.textContent = summary.label ?? "评估任务";
-  panel.appendChild(label);
-
-  if (summary.message) {
-    const message = document.createElement("p");
-    message.textContent = summary.message;
-    panel.appendChild(message);
-  }
-
-  const meta = [];
-  if (summary.mode) {
-    const modeMap = {
-      single: "单个 IP", 
-      subnet: "子网段", 
-      file: "文件导入",
-    };
-    meta.push(`模式：${modeMap[summary.mode] ?? summary.mode}`);
-  }
-
-  if (typeof summary.totalTargets === "number") {
-    meta.push(`目标数量：${summary.totalTargets}`);
-  }
-
-  if (meta.length) {
-    const metaList = document.createElement("div");
-    metaList.className = "summary-meta";
-    meta.forEach((item) => {
-      const entry = document.createElement("span");
-      entry.textContent = item;
-      metaList.appendChild(entry);
-    });
-    panel.appendChild(metaList);
-  }
-
-  if (Array.isArray(summary.targetsPreview) && summary.targetsPreview.length) {
-    const targets = document.createElement("div");
-    targets.className = "summary-targets";
-    summary.targetsPreview.slice(0, 4).forEach((target) => {
-      const tag = document.createElement("span");
-      tag.className = "badge";
-      tag.textContent = target;
-      targets.appendChild(tag);
-    });
-
-    if (summary.targetsPreview.length > 4) {
-      const more = document.createElement("span");
-      more.className = "badge";
-      more.textContent = `+${summary.targetsPreview.length - 4}`;
-      targets.appendChild(more);
-    }
-
-    panel.appendChild(targets);
-  }
-
-  assessmentSummary.appendChild(panel);
 }
 
 function renderStatistics(stats) {
@@ -612,8 +487,6 @@ async function extractError(response) {
 }
 
 function renderAssessment(data) {
-  renderList(scanResults, data?.scan?.overview);
-  renderAssessmentSummary(data?.summary);
   renderRecognition(data?.recognition);
   renderStatistics(data?.scan?.statistics);
 }
@@ -682,12 +555,6 @@ function resetDashboard() {
     targetFileInput.value = "";
   }
   setAssessmentMode("single");
-
-  scanResults.innerHTML = "尚未开始扫描";
-  scanResults.classList.add("placeholder");
-
-  assessmentSummary.textContent = "等待评估任务";
-  assessmentSummary.classList.add("placeholder");
 
   deviceRecognition.innerHTML = "等待识别结果";
   deviceRecognition.classList.add("placeholder");
