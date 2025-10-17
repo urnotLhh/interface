@@ -22,13 +22,13 @@
       <main class="dashboard-grid">
         <section
           class="card ip-assessment"
-          aria-labelledby="ip-input-title"
+          aria-labelledby="device-scan-title"
         >
           <div class="card-header">
             <div>
-              <h2 id="ip-input-title">目标 IP 评估</h2>
+              <h2 id="device-scan-title">设备扫描与识别</h2>
               <p class="description">
-                上传单个 IP、子网段或 IP 列表，快速触发扫描与识别任务，并实时查看执行概况。
+                输入目标范围后立即执行扫描，并集中查看识别结果与统计信息。
               </p>
             </div>
           </div>
@@ -119,38 +119,16 @@
             </div>
             <div class="assessment-side">
               <div class="sub-card">
-                <h3>扫描概览</h3>
-                <div id="scanResults" class="placeholder">尚未开始扫描</div>
-              </div>
-              <div class="sub-card">
-                <h3>执行摘要</h3>
-                <div id="assessmentSummary" class="placeholder">
-                  等待评估任务
+                <h3 id="device-recognition-title">设备识别</h3>
+                <div id="deviceRecognition" class="placeholder">
+                  等待识别结果
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section
-          class="card device-stats"
-          aria-labelledby="device-stats-title"
-        >
-          <h2 id="device-stats-title">设备类型统计</h2>
-          <p class="description">
-            汇总识别结果与关键指标，帮助快速了解网络资产构成与暴露面。
-          </p>
-          <div class="stacked-panels">
-            <div class="sub-card">
-              <h3 id="device-recognition-title">设备识别</h3>
-              <div id="deviceRecognition" class="placeholder">
-                等待识别结果
-              </div>
-            </div>
-            <div class="sub-card">
-              <h3 id="statistics-title">统计信息</h3>
-              <div id="statistics" class="placeholder stats-grid">
-                暂无统计数据
+              <div class="sub-card">
+                <h3 id="statistics-title">统计信息</h3>
+                <div id="statistics" class="placeholder stats-grid">
+                  暂无统计数据
+                </div>
               </div>
             </div>
           </div>
