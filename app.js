@@ -594,10 +594,81 @@ function renderNeo4jDemoGraph() {
     return;
   }
 
-  const nodeIndex = new Map();
-  neo4jDemoGraph.nodes.forEach((node) => {
-    nodeIndex.set(node.id, node);
-  });
+  const nodes = neo4jDemoGraph.nodes.map((node) => ({ ...node }));
+  const nodeIndex = new Map(nodes.map((node) => [node.id, node]));
+  const adjacency = new Map();
+
+  function registerLink(nodeId, record) {
+    if (!adjacency.has(nodeId)) {
+      adjacency.set(nodeId, []);
+    }
+    adjacency.get(nodeId).push(record);
+  }
+
+  function updateLinkPosition(record) {
+    const { line, label, source, target, meta } = record;
+    line.setAttribute("x1", source.x);
+    line.setAttribute("y1", source.y);
+    line.setAttribute("x2", target.x);
+    line.setAttribute("y2", target.y);
+
+    if (label) {
+      const midX = (source.x + target.x) / 2;
+      const midY = (source.y + target.y) / 2;
+      const offsetX = meta.labelOffset?.x ?? 0;
+      const offsetY = meta.labelOffset?.y ?? -8;
+      label.setAttribute("x", midX + offsetX);
+      label.setAttribute("y", midY + offsetY);
+    }
+  }
+
+  function updateLinksForNode(node) {
+    const records = adjacency.get(node.id) ?? [];
+    records.forEach(updateLinkPosition);
+  }
+
+  function getSvgPoint(svgElement, event) {
+    const point = svgElement.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+    const ctm = svgElement.getScreenCTM();
+    if (!ctm) {
+      return { x: point.x, y: point.y };
+    }
+    const transformed = point.matrixTransform(ctm.inverse());
+    return { x: transformed.x, y: transformed.y };
+  }
+
+  let activeDrag = null;
+
+  const handlePointerMove = (event) => {
+    if (!activeDrag || event.pointerId !== activeDrag.pointerId) {
+      return;
+    }
+    event.preventDefault();
+    const point = getSvgPoint(activeDrag.svg, event);
+    const newX = point.x - activeDrag.offsetX;
+    const newY = point.y - activeDrag.offsetY;
+    activeDrag.node.x = newX;
+    activeDrag.node.y = newY;
+    activeDrag.element.setAttribute("transform", `translate(${newX}, ${newY})`);
+    updateLinksForNode(activeDrag.node);
+  };
+
+  const handlePointerUp = (event) => {
+    if (!activeDrag || event.pointerId !== activeDrag.pointerId) {
+      return;
+    }
+    activeDrag.element.classList.remove("is-dragging");
+    activeDrag.svg.classList.remove("neo4j-demo-canvas--dragging");
+    if (activeDrag.element.releasePointerCapture) {
+      activeDrag.element.releasePointerCapture(activeDrag.pointerId);
+    }
+    window.removeEventListener("pointermove", handlePointerMove);
+    window.removeEventListener("pointerup", handlePointerUp);
+    window.removeEventListener("pointercancel", handlePointerUp);
+    activeDrag = null;
+  };
 
   const svg = createSvgElement("svg", {
     viewBox: `0 0 ${neo4jDemoGraph.width} ${neo4jDemoGraph.height}`,
@@ -643,23 +714,28 @@ function renderNeo4jDemoGraph() {
     });
     linkGroup.appendChild(line);
 
+    let label = null;
     if (link.label) {
       const midX = (source.x + target.x) / 2;
       const midY = (source.y + target.y) / 2;
-      const label = createSvgElement("text", {
+      label = createSvgElement("text", {
         x: midX + (link.labelOffset?.x ?? 0),
         y: midY + (link.labelOffset?.y ?? -8),
       });
       label.textContent = link.label;
       labelGroup.appendChild(label);
     }
+
+    const record = { line, label, source, target, meta: link };
+    registerLink(link.source, record);
+    registerLink(link.target, record);
   });
 
   svg.appendChild(linkGroup);
   svg.appendChild(labelGroup);
 
   const nodeGroup = createSvgElement("g", { class: "neo4j-nodes" });
-  neo4jDemoGraph.nodes.forEach((node) => {
+  nodes.forEach((node) => {
     const group = createSvgElement("g", {
       class: `neo4j-node neo4j-node--${node.group}`,
       transform: `translate(${node.x}, ${node.y})`,
@@ -674,6 +750,27 @@ function renderNeo4jDemoGraph() {
       const text = createSvgElement("text", { y: offset });
       text.textContent = line;
       group.appendChild(text);
+    });
+
+    group.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      const point = getSvgPoint(svg, event);
+      activeDrag = {
+        node,
+        element: group,
+        svg,
+        pointerId: event.pointerId,
+        offsetX: point.x - node.x,
+        offsetY: point.y - node.y,
+      };
+      if (group.setPointerCapture) {
+        group.setPointerCapture(event.pointerId);
+      }
+      group.classList.add("is-dragging");
+      svg.classList.add("neo4j-demo-canvas--dragging");
+      window.addEventListener("pointermove", handlePointerMove);
+      window.addEventListener("pointerup", handlePointerUp);
+      window.addEventListener("pointercancel", handlePointerUp);
     });
 
     nodeGroup.appendChild(group);

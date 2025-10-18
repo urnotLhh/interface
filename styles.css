@@ -787,6 +787,19 @@ button:disabled {
   font-weight: 600;
 }
 
+.neo4j-node {
+  cursor: grab;
+  touch-action: none;
+}
+
+.neo4j-node.is-dragging {
+  cursor: grabbing;
+}
+
+.neo4j-demo-canvas--dragging {
+  cursor: grabbing;
+}
+
 .neo4j-node circle {
   fill: #e2e8f0;
   stroke: rgba(148, 163, 184, 0.8);
