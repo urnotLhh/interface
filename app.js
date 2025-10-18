@@ -104,12 +104,10 @@ function clone(data) {
 }
 
 function getDefaultNeo4jUrl() {
-  const { protocol, hostname } = window.location;
+  const { hostname } = window.location;
   const sanitizedHost = hostname || "localhost";
-  const isSecure = protocol === "https:";
-  const neo4jProtocol = isSecure ? "https:" : "http:";
-  const neo4jPort = isSecure ? 7473 : 7474;
-  return `${neo4jProtocol}//${sanitizedHost}:${neo4jPort}/browser/`;
+  const neo4jPort = 7687;
+  return `bolt://${sanitizedHost}:${neo4jPort}/neo4j`;
 }
 
 function sanitizeForHtml(value) {
@@ -127,7 +125,9 @@ function updateNeo4jHostHint(url) {
     return;
   }
   const source = url && url.trim() ? url.trim() : DEFAULT_NEO4J_URL;
-  const hostText = source.replace(/\/browser\/?$/, "");
+  const hostText = source
+    .replace(/\/browser\/?$/i, "")
+    .replace(/\/neo4j\/?$/i, "");
   neo4jHostHint.textContent = hostText;
 }
 
@@ -555,7 +555,7 @@ function handleNeo4jModeChange(mode) {
     const targetUrl = neo4jUrlInput.value?.trim();
     if (!targetUrl) {
       neo4jPreview.innerHTML =
-        '<div class="placeholder">请输入 Neo4j 浏览器地址，例如 <code>' +
+        '<div class="placeholder">请输入 Neo4j 连接地址，例如 <code>' +
         sanitizeForHtml(DEFAULT_NEO4J_URL) +
         "</code></div>";
       neo4jPreview.classList.add("placeholder");
@@ -568,7 +568,7 @@ function handleNeo4jModeChange(mode) {
     iframe.title = "Neo4j 浏览器";
     iframe.addEventListener("error", () => {
       neo4jPreview.innerHTML =
-        '<div class="alert">无法加载 Neo4j 浏览器地址 <code>' +
+        '<div class="alert">无法加载 Neo4j 连接地址 <code>' +
         sanitizeForHtml(targetUrl) +
         "</code>。请确认服务已启动并允许从当前主机访问。</div>";
       neo4jPreview.classList.add("placeholder");
