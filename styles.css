@@ -656,6 +656,25 @@ button:disabled {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 0.7rem;
+  align-items: stretch;
+}
+
+.neo4j-hint {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.85rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(59, 130, 246, 0.08));
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.neo4j-hint strong {
+  color: var(--text-primary);
+  font-size: 0.85rem;
 }
 
 .neo4j-preview {
@@ -668,6 +687,14 @@ button:disabled {
   align-items: center;
   justify-content: center;
   padding: 0.85rem;
+}
+
+.neo4j-preview.graph-mode {
+  padding: 0;
+  align-items: stretch;
+  justify-content: stretch;
+  background: #fff;
+  border-color: rgba(148, 163, 184, 0.35);
 }
 
 .neo4j-preview iframe,
@@ -718,6 +745,141 @@ button:disabled {
 
 #neo4jImage {
   display: none;
+}
+
+.neo4j-preview .neo4j-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  width: 100%;
+  background: #fff;
+}
+
+.neo4j-demo-canvas {
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  color: rgba(148, 163, 184, 0.6);
+}
+
+.neo4j-links line {
+  stroke: currentColor;
+  stroke-width: 1.6;
+  opacity: 0.8;
+}
+
+.neo4j-link-labels text {
+  fill: #475569;
+  font-size: 0.7rem;
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.neo4j-nodes text {
+  fill: #1f2937;
+  font-size: 0.7rem;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-weight: 600;
+}
+
+.neo4j-node {
+  cursor: grab;
+  touch-action: none;
+}
+
+.neo4j-node.is-dragging {
+  cursor: grabbing;
+}
+
+.neo4j-demo-canvas--dragging {
+  cursor: grabbing;
+}
+
+.neo4j-node circle {
+  fill: #e2e8f0;
+  stroke: rgba(148, 163, 184, 0.8);
+  stroke-width: 1.5;
+}
+
+.neo4j-node--actor circle {
+  fill: #e85c41;
+}
+
+.neo4j-node--device circle {
+  fill: #4aa3df;
+}
+
+.neo4j-node--series circle {
+  fill: #95c4e6;
+}
+
+.neo4j-node--vendor circle {
+  fill: #f7b347;
+}
+
+.neo4j-node--vulnerability circle {
+  fill: #ef8455;
+}
+
+.neo4j-demo-caption {
+  font-size: 0.75rem;
+  color: #4b5563;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.neo4j-demo-caption strong {
+  color: #1f2937;
+}
+
+.neo4j-demo-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.neo4j-demo-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #475569;
+  font-size: 0.72rem;
+}
+
+.legend-swatch {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+}
+
+.legend-swatch--actor {
+  background: #e85c41;
+}
+
+.legend-swatch--device {
+  background: #4aa3df;
+}
+
+.legend-swatch--series {
+  background: #95c4e6;
+}
+
+.legend-swatch--vendor {
+  background: #f7b347;
+}
+
+.legend-swatch--vulnerability {
+  background: #ef8455;
 }
 
 .badge.neutral {

@@ -5,9 +5,8 @@ const vulnerabilityResults = document.getElementById("vulnerabilityResults");
 const analysisResults = document.getElementById("analysisResults");
 const useRecognizedDevices = document.getElementById("useRecognizedDevices");
 const neo4jPreview = document.getElementById("neo4jPreview");
-const neo4jUrlInput = document.getElementById("neo4jUrl");
 const neo4jImageInput = document.getElementById("neo4jImage");
-const neo4jHostHint = document.getElementById("neo4jHostHint");
+const neo4jModeInputs = document.querySelectorAll('input[name="neo4jMode"]');
 const vulnTime = document.getElementById("vulnTime");
 const assessmentForm = document.getElementById("assessmentForm");
 const assessmentModeInputs = document.querySelectorAll('input[name="assessmentMode"]');
@@ -94,22 +93,61 @@ const API_ENDPOINTS = {
   analysis: "/api/cpe-mapping",
 };
 
-const DEFAULT_NEO4J_URL = getDefaultNeo4jUrl();
+const neo4jDemoGraph = {
+  width: 940,
+  height: 480,
+  groups: {
+    actor: { label: "攻击源", color: "#e85c41" },
+    device: { label: "D-Link 设备", color: "#4aa3df" },
+    series: { label: "产品系列", color: "#95c4e6" },
+    vendor: { label: "厂商节点", color: "#f7b347" },
+    vulnerability: { label: "关联漏洞", color: "#ef8455" },
+  },
+  nodes: [
+    { id: "alphad", label: "alphad", group: "actor", x: 100, y: 240, radius: 32 },
+    { id: "dcs-932l", label: "DCS-932L", group: "device", x: 250, y: 50, radius: 26 },
+    { id: "dcs-930l", label: "DCS-930L", group: "device", x: 250, y: 130, radius: 26 },
+    { id: "dcs-931l", label: "DCS-931L", group: "device", x: 250, y: 210, radius: 26 },
+    { id: "dcs-933l", label: "DCS-933L", group: "device", x: 250, y: 290, radius: 26 },
+    { id: "dcs-934l", label: "DCS-934L", group: "device", x: 250, y: 370, radius: 26 },
+    {
+      id: "dcs-series",
+      label: "The D-Link\nDCS series",
+      group: "series",
+      x: 440,
+      y: 220,
+      radius: 54,
+    },
+    { id: "d-link", label: "D-Link", group: "vendor", x: 650, y: 220, radius: 52 },
+    { id: "vuln-1", label: "A vulners", group: "vulnerability", x: 810, y: 120, radius: 24 },
+    { id: "vuln-2", label: "A vulners", group: "vulnerability", x: 810, y: 190, radius: 24 },
+    { id: "vuln-3", label: "A vulners", group: "vulnerability", x: 810, y: 260, radius: 24 },
+    { id: "vuln-4", label: "A vulners", group: "vulnerability", x: 810, y: 330, radius: 24 },
+  ],
+  links: [
+    { source: "alphad", target: "dcs-932l", label: "攻击路径", labelOffset: { x: -34, y: -18 } },
+    { source: "alphad", target: "dcs-930l", label: "攻击路径", labelOffset: { x: -34, y: -10 } },
+    { source: "alphad", target: "dcs-931l", label: "攻击路径", labelOffset: { x: -34, y: -2 } },
+    { source: "alphad", target: "dcs-933l", label: "攻击路径", labelOffset: { x: -34, y: 8 } },
+    { source: "alphad", target: "dcs-934l", label: "攻击路径", labelOffset: { x: -34, y: 18 } },
+    { source: "dcs-932l", target: "dcs-series", label: "同系列", labelOffset: { y: -22 } },
+    { source: "dcs-930l", target: "dcs-series", label: "同系列", labelOffset: { y: -12 } },
+    { source: "dcs-931l", target: "dcs-series", label: "同系列", labelOffset: { y: -2 } },
+    { source: "dcs-933l", target: "dcs-series", label: "同系列", labelOffset: { y: 10 } },
+    { source: "dcs-934l", target: "dcs-series", label: "同系列", labelOffset: { y: 20 } },
+    { source: "dcs-series", target: "d-link", label: "厂商归属", labelOffset: { y: -22 } },
+    { source: "vuln-1", target: "d-link", label: "公开漏洞", labelOffset: { x: 18, y: -18 } },
+    { source: "vuln-2", target: "d-link", label: "公开漏洞", labelOffset: { x: 18, y: -6 } },
+    { source: "vuln-3", target: "d-link", label: "公开漏洞", labelOffset: { x: 18, y: 6 } },
+    { source: "vuln-4", target: "d-link", label: "公开漏洞", labelOffset: { x: 18, y: 18 } },
+  ],
+};
 
 function clone(data) {
   if (typeof structuredClone === "function") {
     return structuredClone(data);
   }
   return JSON.parse(JSON.stringify(data));
-}
-
-function getDefaultNeo4jUrl() {
-  const { protocol, hostname } = window.location;
-  const sanitizedHost = hostname || "localhost";
-  const isSecure = protocol === "https:";
-  const neo4jProtocol = isSecure ? "https:" : "http:";
-  const neo4jPort = isSecure ? 7473 : 7474;
-  return `${neo4jProtocol}//${sanitizedHost}:${neo4jPort}/browser/`;
 }
 
 function sanitizeForHtml(value) {
@@ -120,15 +158,6 @@ function sanitizeForHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
-}
-
-function updateNeo4jHostHint(url) {
-  if (!neo4jHostHint) {
-    return;
-  }
-  const source = url && url.trim() ? url.trim() : DEFAULT_NEO4J_URL;
-  const hostText = source.replace(/\/browser\/?$/, "");
-  neo4jHostHint.textContent = hostText;
 }
 
 function getActiveAssessmentMode() {
@@ -550,35 +579,251 @@ function resetDashboard() {
   updateStatus("ready", initialStatus);
 }
 
-function handleNeo4jModeChange(mode) {
-  if (mode === "embed") {
-    const targetUrl = neo4jUrlInput.value?.trim();
-    if (!targetUrl) {
-      neo4jPreview.innerHTML =
-        '<div class="placeholder">请输入 Neo4j 浏览器地址，例如 <code>' +
-        sanitizeForHtml(DEFAULT_NEO4J_URL) +
-        "</code></div>";
-      neo4jPreview.classList.add("placeholder");
+function createSvgElement(name, attributes = {}) {
+  const element = document.createElementNS("http://www.w3.org/2000/svg", name);
+  Object.entries(attributes).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      element.setAttribute(key, value);
+    }
+  });
+  return element;
+}
+
+function renderNeo4jDemoGraph() {
+  if (!neo4jPreview) {
+    return;
+  }
+
+  const nodes = neo4jDemoGraph.nodes.map((node) => ({ ...node }));
+  const nodeIndex = new Map(nodes.map((node) => [node.id, node]));
+  const adjacency = new Map();
+
+  function registerLink(nodeId, record) {
+    if (!adjacency.has(nodeId)) {
+      adjacency.set(nodeId, []);
+    }
+    adjacency.get(nodeId).push(record);
+  }
+
+  function updateLinkPosition(record) {
+    const { line, label, source, target, meta } = record;
+    line.setAttribute("x1", source.x);
+    line.setAttribute("y1", source.y);
+    line.setAttribute("x2", target.x);
+    line.setAttribute("y2", target.y);
+
+    if (label) {
+      const midX = (source.x + target.x) / 2;
+      const midY = (source.y + target.y) / 2;
+      const offsetX = meta.labelOffset?.x ?? 0;
+      const offsetY = meta.labelOffset?.y ?? -8;
+      label.setAttribute("x", midX + offsetX);
+      label.setAttribute("y", midY + offsetY);
+    }
+  }
+
+  function updateLinksForNode(node) {
+    const records = adjacency.get(node.id) ?? [];
+    records.forEach(updateLinkPosition);
+  }
+
+  function getSvgPoint(svgElement, event) {
+    const point = svgElement.createSVGPoint();
+    point.x = event.clientX;
+    point.y = event.clientY;
+    const ctm = svgElement.getScreenCTM();
+    if (!ctm) {
+      return { x: point.x, y: point.y };
+    }
+    const transformed = point.matrixTransform(ctm.inverse());
+    return { x: transformed.x, y: transformed.y };
+  }
+
+  let activeDrag = null;
+
+  const handlePointerMove = (event) => {
+    if (!activeDrag || event.pointerId !== activeDrag.pointerId) {
+      return;
+    }
+    event.preventDefault();
+    const point = getSvgPoint(activeDrag.svg, event);
+    const newX = point.x - activeDrag.offsetX;
+    const newY = point.y - activeDrag.offsetY;
+    activeDrag.node.x = newX;
+    activeDrag.node.y = newY;
+    activeDrag.element.setAttribute("transform", `translate(${newX}, ${newY})`);
+    updateLinksForNode(activeDrag.node);
+  };
+
+  const handlePointerUp = (event) => {
+    if (!activeDrag || event.pointerId !== activeDrag.pointerId) {
+      return;
+    }
+    activeDrag.element.classList.remove("is-dragging");
+    activeDrag.svg.classList.remove("neo4j-demo-canvas--dragging");
+    if (activeDrag.element.releasePointerCapture) {
+      activeDrag.element.releasePointerCapture(activeDrag.pointerId);
+    }
+    window.removeEventListener("pointermove", handlePointerMove);
+    window.removeEventListener("pointerup", handlePointerUp);
+    window.removeEventListener("pointercancel", handlePointerUp);
+    activeDrag = null;
+  };
+
+  const svg = createSvgElement("svg", {
+    viewBox: `0 0 ${neo4jDemoGraph.width} ${neo4jDemoGraph.height}`,
+    class: "neo4j-demo-canvas",
+    role: "img",
+    "aria-label": "D-Link 设备及漏洞关联的模拟图谱",
+  });
+
+  const defs = createSvgElement("defs");
+  const marker = createSvgElement("marker", {
+    id: "neo4j-arrowhead",
+    viewBox: "0 0 12 12",
+    refX: "12",
+    refY: "6",
+    markerWidth: "12",
+    markerHeight: "12",
+    orient: "auto-start-reverse",
+  });
+  const markerPath = createSvgElement("path", {
+    d: "M0,0 L12,6 L0,12 z",
+    fill: "currentColor",
+  });
+  marker.appendChild(markerPath);
+  defs.appendChild(marker);
+  svg.appendChild(defs);
+
+  const linkGroup = createSvgElement("g", { class: "neo4j-links" });
+  const labelGroup = createSvgElement("g", { class: "neo4j-link-labels" });
+
+  neo4jDemoGraph.links.forEach((link) => {
+    const source = nodeIndex.get(link.source);
+    const target = nodeIndex.get(link.target);
+    if (!source || !target) {
       return;
     }
 
-    neo4jPreview.innerHTML = "";
-    const iframe = document.createElement("iframe");
-    iframe.src = targetUrl;
-    iframe.title = "Neo4j 浏览器";
-    iframe.addEventListener("error", () => {
-      neo4jPreview.innerHTML =
-        '<div class="alert">无法加载 Neo4j 浏览器地址 <code>' +
-        sanitizeForHtml(targetUrl) +
-        "</code>。请确认服务已启动并允许从当前主机访问。</div>";
-      neo4jPreview.classList.add("placeholder");
+    const line = createSvgElement("line", {
+      x1: source.x,
+      y1: source.y,
+      x2: target.x,
+      y2: target.y,
+      "marker-end": "url(#neo4j-arrowhead)",
     });
-    neo4jPreview.appendChild(iframe);
-    neo4jPreview.classList.remove("placeholder");
-  } else {
-    neo4jPreview.innerHTML = '<div class="placeholder">请上传一张示例图片</div>';
-    neo4jPreview.classList.add("placeholder");
+    linkGroup.appendChild(line);
+
+    let label = null;
+    if (link.label) {
+      const midX = (source.x + target.x) / 2;
+      const midY = (source.y + target.y) / 2;
+      label = createSvgElement("text", {
+        x: midX + (link.labelOffset?.x ?? 0),
+        y: midY + (link.labelOffset?.y ?? -8),
+      });
+      label.textContent = link.label;
+      labelGroup.appendChild(label);
+    }
+
+    const record = { line, label, source, target, meta: link };
+    registerLink(link.source, record);
+    registerLink(link.target, record);
+  });
+
+  svg.appendChild(linkGroup);
+  svg.appendChild(labelGroup);
+
+  const nodeGroup = createSvgElement("g", { class: "neo4j-nodes" });
+  nodes.forEach((node) => {
+    const group = createSvgElement("g", {
+      class: `neo4j-node neo4j-node--${node.group}`,
+      transform: `translate(${node.x}, ${node.y})`,
+    });
+    const radius = node.radius ?? 30;
+    const circle = createSvgElement("circle", { r: radius });
+    group.appendChild(circle);
+
+    const lines = String(node.label ?? "").split(/\n+/);
+    lines.forEach((line, index) => {
+      const offset = (index - (lines.length - 1) / 2) * 16;
+      const text = createSvgElement("text", { y: offset });
+      text.textContent = line;
+      group.appendChild(text);
+    });
+
+    group.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      const point = getSvgPoint(svg, event);
+      activeDrag = {
+        node,
+        element: group,
+        svg,
+        pointerId: event.pointerId,
+        offsetX: point.x - node.x,
+        offsetY: point.y - node.y,
+      };
+      if (group.setPointerCapture) {
+        group.setPointerCapture(event.pointerId);
+      }
+      group.classList.add("is-dragging");
+      svg.classList.add("neo4j-demo-canvas--dragging");
+      window.addEventListener("pointermove", handlePointerMove);
+      window.addEventListener("pointerup", handlePointerUp);
+      window.addEventListener("pointercancel", handlePointerUp);
+    });
+
+    nodeGroup.appendChild(group);
+  });
+  svg.appendChild(nodeGroup);
+
+  const figure = document.createElement("figure");
+  figure.className = "neo4j-demo";
+  figure.appendChild(svg);
+
+  const caption = document.createElement("figcaption");
+  caption.className = "neo4j-demo-caption";
+  caption.innerHTML =
+    '示例图谱展示攻击源 <strong>alphad</strong> 与 D-Link 摄像头系列及其公开漏洞之间的拓扑关系。';
+
+  const legend = document.createElement("ul");
+  legend.className = "neo4j-demo-legend";
+
+  Object.entries(neo4jDemoGraph.groups).forEach(([key, meta]) => {
+    const item = document.createElement("li");
+    const swatch = document.createElement("span");
+    swatch.className = `legend-swatch legend-swatch--${key}`;
+    item.appendChild(swatch);
+    item.appendChild(document.createTextNode(meta.label));
+    legend.appendChild(item);
+  });
+
+  caption.appendChild(legend);
+  figure.appendChild(caption);
+
+  neo4jPreview.innerHTML = "";
+  neo4jPreview.classList.remove("placeholder");
+  neo4jPreview.classList.add("graph-mode");
+  neo4jPreview.appendChild(figure);
+}
+
+function handleNeo4jModeChange(mode) {
+  if (!neo4jPreview) {
+    return;
   }
+
+  if (mode === "demo") {
+    renderNeo4jDemoGraph();
+    return;
+  }
+
+  neo4jPreview.classList.remove("graph-mode");
+  neo4jPreview.innerHTML = "";
+  const placeholder = document.createElement("div");
+  placeholder.className = "placeholder";
+  placeholder.textContent = "请上传一张示例图片";
+  neo4jPreview.appendChild(placeholder);
+  neo4jPreview.classList.add("placeholder");
 }
 
 function handleNeo4jImageUpload(file) {
@@ -590,45 +835,43 @@ function handleNeo4jImageUpload(file) {
     img.src = event.target.result;
     img.alt = "Neo4j 节点关联示例图";
     neo4jPreview.appendChild(img);
+    neo4jPreview.classList.remove("placeholder");
+    neo4jPreview.classList.remove("graph-mode");
   };
   reader.readAsDataURL(file);
 }
 
 function initNeo4jSection() {
-  if (!neo4jUrlInput || !neo4jPreview) {
+  if (!neo4jPreview) {
     return;
   }
 
-  if (!neo4jUrlInput.value) {
-    neo4jUrlInput.value = DEFAULT_NEO4J_URL;
-  }
-
-  if (!neo4jUrlInput.placeholder || neo4jUrlInput.placeholder.includes("localhost:7474")) {
-    neo4jUrlInput.placeholder = DEFAULT_NEO4J_URL;
-  }
-
-  updateNeo4jHostHint(neo4jUrlInput.value);
-
-  document.querySelectorAll('input[name="neo4jMode"]').forEach((input) => {
+  const inputs = Array.from(neo4jModeInputs);
+  inputs.forEach((input) => {
     input.addEventListener("change", (event) => {
       const mode = event.target.value;
-      neo4jImageInput.disabled = mode !== "image";
-      neo4jUrlInput.disabled = mode !== "embed";
+      if (neo4jImageInput) {
+        neo4jImageInput.disabled = mode !== "image";
+        if (mode !== "image") {
+          neo4jImageInput.value = "";
+        }
+      }
       handleNeo4jModeChange(mode);
     });
   });
 
-  neo4jUrlInput.addEventListener("input", (event) => {
-    updateNeo4jHostHint(event.target.value);
-  });
+  if (neo4jImageInput) {
+    neo4jImageInput.disabled = true;
+    neo4jImageInput.addEventListener("change", (event) =>
+      handleNeo4jImageUpload(event.target.files[0])
+    );
+  }
 
-  neo4jUrlInput.addEventListener("change", () => {
-    updateNeo4jHostHint(neo4jUrlInput.value);
-    handleNeo4jModeChange("embed");
-  });
-  neo4jImageInput.addEventListener("change", (event) => handleNeo4jImageUpload(event.target.files[0]));
-
-  handleNeo4jModeChange("embed");
+  const initialMode = inputs.find((input) => input.checked)?.value ?? "demo";
+  if (neo4jImageInput) {
+    neo4jImageInput.disabled = initialMode !== "image";
+  }
+  handleNeo4jModeChange(initialMode);
 }
 
 function initEventListeners() {
