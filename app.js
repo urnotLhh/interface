@@ -95,51 +95,194 @@ const API_ENDPOINTS = {
 
 const neo4jDemoGraph = {
   width: 940,
-  height: 480,
+  height: 520,
   groups: {
-    actor: { label: "攻击源", color: "#e85c41" },
-    device: { label: "D-Link 设备", color: "#4aa3df" },
-    series: { label: "产品系列", color: "#95c4e6" },
-    vendor: { label: "厂商节点", color: "#f7b347" },
-    vulnerability: { label: "关联漏洞", color: "#ef8455" },
+    issue: {
+      label: "漏洞 / 公告节点",
+      color: "#f28d52",
+      stroke: "#dd6b27",
+    },
+    context: {
+      label: "系统 / 状态节点",
+      color: "#c9ced8",
+      stroke: "#aeb6c3",
+    },
+    model: {
+      label: "D-Link 摄像头型号",
+      color: "#4f8df6",
+      stroke: "#3564d4",
+    },
+    vendor: {
+      label: "厂商",
+      color: "#32b375",
+      stroke: "#21925d",
+    },
+    marker: {
+      label: "alpha 标记",
+      color: "#f6d74b",
+      stroke: "#ddb320",
+    },
   },
   nodes: [
-    { id: "alphad", label: "alphad", group: "actor", x: 100, y: 240, radius: 32 },
-    { id: "dcs-932l", label: "DCS-932L", group: "device", x: 250, y: 50, radius: 26 },
-    { id: "dcs-930l", label: "DCS-930L", group: "device", x: 250, y: 130, radius: 26 },
-    { id: "dcs-931l", label: "DCS-931L", group: "device", x: 250, y: 210, radius: 26 },
-    { id: "dcs-933l", label: "DCS-933L", group: "device", x: 250, y: 290, radius: 26 },
-    { id: "dcs-934l", label: "DCS-934L", group: "device", x: 250, y: 370, radius: 26 },
+    { id: "alpha", label: "alpha", group: "marker", x: 140, y: 110, radius: 28 },
+    { id: "dcs930l", label: "DCS-930L", group: "model", x: 260, y: 90, radius: 24 },
+    { id: "dcs931l", label: "DCS-931L", group: "model", x: 290, y: 160, radius: 24 },
+    { id: "dcs932l", label: "DCS-932L", group: "model", x: 270, y: 240, radius: 24 },
+    { id: "dcs933l", label: "DCS-933L", group: "model", x: 380, y: 120, radius: 24 },
+    { id: "dcs934l", label: "DCS-934L", group: "model", x: 400, y: 200, radius: 24 },
     {
       id: "dcs-series",
-      label: "The D-Link\nDCS series",
-      group: "series",
-      x: 440,
+      label: "D-Link DCS\nseries",
+      group: "context",
+      x: 420,
       y: 220,
-      radius: 54,
+      radius: 42,
     },
-    { id: "d-link", label: "D-Link", group: "vendor", x: 650, y: 220, radius: 52 },
-    { id: "vuln-1", label: "A vulners", group: "vulnerability", x: 810, y: 120, radius: 24 },
-    { id: "vuln-2", label: "A vulners", group: "vulnerability", x: 810, y: 190, radius: 24 },
-    { id: "vuln-3", label: "A vulners", group: "vulnerability", x: 810, y: 260, radius: 24 },
-    { id: "vuln-4", label: "A vulners", group: "vulnerability", x: 810, y: 330, radius: 24 },
+    { id: "camera", label: "Camera", group: "context", x: 510, y: 100, radius: 26 },
+    { id: "etc-rc", label: "/etc/rc", group: "context", x: 510, y: 260, radius: 26 },
+    { id: "dlink", label: "D-Link", group: "vendor", x: 560, y: 200, radius: 48 },
+    {
+      id: "issue-discovered",
+      label: "An issue was\ndiscovered",
+      group: "issue",
+      x: 650,
+      y: 130,
+      radius: 30,
+    },
+    {
+      id: "issue-privilege",
+      label: "An Elevated\nPrivilege",
+      group: "issue",
+      x: 620,
+      y: 280,
+      radius: 30,
+    },
+    { id: "issue-published", label: "Published", group: "issue", x: 720, y: 80, radius: 22 },
+    { id: "issue-comm", label: "comm", group: "issue", x: 730, y: 150, radius: 22 },
+    {
+      id: "issue-vulnerability",
+      label: "A vulnerability",
+      group: "issue",
+      x: 700,
+      y: 210,
+      radius: 26,
+    },
+    {
+      id: "issue-vulnerabilities",
+      label: "vulnerabilities",
+      group: "issue",
+      x: 760,
+      y: 240,
+      radius: 26,
+    },
   ],
   links: [
-    { source: "alphad", target: "dcs-932l", label: "攻击路径", labelOffset: { x: -34, y: -18 } },
-    { source: "alphad", target: "dcs-930l", label: "攻击路径", labelOffset: { x: -34, y: -10 } },
-    { source: "alphad", target: "dcs-931l", label: "攻击路径", labelOffset: { x: -34, y: -2 } },
-    { source: "alphad", target: "dcs-933l", label: "攻击路径", labelOffset: { x: -34, y: 8 } },
-    { source: "alphad", target: "dcs-934l", label: "攻击路径", labelOffset: { x: -34, y: 18 } },
-    { source: "dcs-932l", target: "dcs-series", label: "同系列", labelOffset: { y: -22 } },
-    { source: "dcs-930l", target: "dcs-series", label: "同系列", labelOffset: { y: -12 } },
-    { source: "dcs-931l", target: "dcs-series", label: "同系列", labelOffset: { y: -2 } },
-    { source: "dcs-933l", target: "dcs-series", label: "同系列", labelOffset: { y: 10 } },
-    { source: "dcs-934l", target: "dcs-series", label: "同系列", labelOffset: { y: 20 } },
-    { source: "dcs-series", target: "d-link", label: "厂商归属", labelOffset: { y: -22 } },
-    { source: "vuln-1", target: "d-link", label: "公开漏洞", labelOffset: { x: 18, y: -18 } },
-    { source: "vuln-2", target: "d-link", label: "公开漏洞", labelOffset: { x: 18, y: -6 } },
-    { source: "vuln-3", target: "d-link", label: "公开漏洞", labelOffset: { x: 18, y: 6 } },
-    { source: "vuln-4", target: "d-link", label: "公开漏洞", labelOffset: { x: 18, y: 18 } },
+    { source: "alpha", target: "dcs930l", label: "关联", labelOffset: { x: -34, y: -20 } },
+    { source: "alpha", target: "dcs931l", label: "关联", labelOffset: { x: -36, y: -10 } },
+    { source: "alpha", target: "dcs932l", label: "关联", labelOffset: { x: -36, y: 0 } },
+    { source: "alpha", target: "dcs933l", label: "关联", labelOffset: { x: -30, y: 12 } },
+    { source: "alpha", target: "dcs934l", label: "关联", labelOffset: { x: -30, y: 24 } },
+    { source: "dcs930l", target: "dcs931l", label: "同系列", labelOffset: { y: -14 } },
+    { source: "dcs931l", target: "dcs932l", label: "同系列", labelOffset: { y: 16 } },
+    { source: "dcs932l", target: "dcs933l", label: "同系列", labelOffset: { y: 16 } },
+    { source: "dcs933l", target: "dcs934l", label: "同系列", labelOffset: { y: 16 } },
+    { source: "dcs930l", target: "dcs-series", label: "DCS 系列", labelOffset: { y: -18 } },
+    { source: "dcs931l", target: "dcs-series", label: "DCS 系列", labelOffset: { y: -8 } },
+    { source: "dcs932l", target: "dcs-series", label: "DCS 系列", labelOffset: { y: 4 } },
+    { source: "dcs933l", target: "dcs-series", label: "DCS 系列", labelOffset: { y: 14 } },
+    { source: "dcs934l", target: "dcs-series", label: "DCS 系列", labelOffset: { y: 20 } },
+    { source: "dcs-series", target: "dlink", label: "厂商归属", labelOffset: { y: -28 } },
+    { source: "dlink", target: "dcs-series", label: "设备族", labelOffset: { x: -46, y: -6 } },
+    { source: "camera", target: "dlink", label: "摄像头产品", labelOffset: { x: 8, y: -22 } },
+    { source: "etc-rc", target: "dlink", label: "系统启动", labelOffset: { x: 12, y: 20 } },
+    { source: "dcs933l", target: "camera", label: "摄像头模块", labelOffset: { x: 16, y: -18 } },
+    { source: "dcs934l", target: "camera", label: "摄像头模块", labelOffset: { x: 18, y: -12 } },
+    { source: "dcs933l", target: "etc-rc", label: "脚本配置", labelOffset: { x: 0, y: 18 } },
+    { source: "dcs934l", target: "etc-rc", label: "脚本配置", labelOffset: { x: 0, y: 18 } },
+    {
+      source: "dcs930l",
+      target: "issue-discovered",
+      label: "问题触发",
+      labelOffset: { x: 22, y: -18 },
+    },
+    {
+      source: "dcs931l",
+      target: "issue-discovered",
+      label: "问题触发",
+      labelOffset: { x: 26, y: -4 },
+    },
+    {
+      source: "dcs932l",
+      target: "issue-privilege",
+      label: "权限关联",
+      labelOffset: { x: 18, y: 16 },
+    },
+    {
+      source: "dcs934l",
+      target: "issue-privilege",
+      label: "权限关联",
+      labelOffset: { x: 14, y: 20 },
+    },
+    {
+      source: "dcs934l",
+      target: "issue-vulnerability",
+      label: "漏洞关联",
+      labelOffset: { x: 24, y: 12 },
+    },
+    {
+      source: "camera",
+      target: "issue-vulnerability",
+      label: "配置问题",
+      labelOffset: { x: 20, y: -16 },
+    },
+    {
+      source: "issue-discovered",
+      target: "dlink",
+      label: "公告",
+      labelOffset: { x: 12, y: -22 },
+    },
+    {
+      source: "issue-discovered",
+      target: "dcs-series",
+      label: "影响",
+      labelOffset: { x: -12, y: -22 },
+    },
+    {
+      source: "issue-privilege",
+      target: "dlink",
+      label: "权限提升",
+      labelOffset: { x: 8, y: 24 },
+    },
+    {
+      source: "dlink",
+      target: "issue-published",
+      label: "公布",
+      labelOffset: { x: 24, y: -30 },
+    },
+    {
+      source: "dlink",
+      target: "issue-comm",
+      label: "通告",
+      labelOffset: { x: 28, y: -6 },
+    },
+    {
+      source: "dlink",
+      target: "issue-vulnerability",
+      label: "漏洞信息",
+      labelOffset: { x: 28, y: 12 },
+    },
+    {
+      source: "dlink",
+      target: "issue-vulnerabilities",
+      label: "漏洞库",
+      labelOffset: { x: 36, y: 24 },
+    },
+    {
+      source: "issue-vulnerability",
+      target: "issue-vulnerabilities",
+      label: "收录",
+      labelOffset: { x: 24, y: 4 },
+    },
   ],
 };
 
@@ -740,6 +883,14 @@ function renderNeo4jDemoGraph() {
       class: `neo4j-node neo4j-node--${node.group}`,
       transform: `translate(${node.x}, ${node.y})`,
     });
+    const groupMeta = neo4jDemoGraph.groups[node.group];
+    if (groupMeta) {
+      group.style.setProperty("--neo4j-node-fill", groupMeta.color);
+      group.style.setProperty(
+        "--neo4j-node-stroke",
+        groupMeta.stroke ?? "rgba(148, 163, 184, 0.6)"
+      );
+    }
     const radius = node.radius ?? 30;
     const circle = createSvgElement("circle", { r: radius });
     group.appendChild(circle);
@@ -784,7 +935,7 @@ function renderNeo4jDemoGraph() {
   const caption = document.createElement("figcaption");
   caption.className = "neo4j-demo-caption";
   caption.innerHTML =
-    '示例图谱展示攻击源 <strong>alphad</strong> 与 D-Link 摄像头系列及其公开漏洞之间的拓扑关系。';
+    '示例图谱复刻参考图：<strong>D-Link</strong> 中心节点与 <strong>alpha</strong> 标记、各型号摄像头及漏洞公告之间的关联。颜色依次对应漏洞/公告（橙）、系统/状态（灰）、设备型号（蓝）、厂商（绿）、标记（黄）。';
 
   const legend = document.createElement("ul");
   legend.className = "neo4j-demo-legend";
@@ -792,7 +943,14 @@ function renderNeo4jDemoGraph() {
   Object.entries(neo4jDemoGraph.groups).forEach(([key, meta]) => {
     const item = document.createElement("li");
     const swatch = document.createElement("span");
-    swatch.className = `legend-swatch legend-swatch--${key}`;
+    swatch.className = "legend-swatch";
+    if (meta?.color) {
+      swatch.style.setProperty("--legend-color", meta.color);
+      swatch.style.setProperty(
+        "--legend-stroke",
+        meta.stroke ?? "rgba(148, 163, 184, 0.6)"
+      );
+    }
     item.appendChild(swatch);
     item.appendChild(document.createTextNode(meta.label));
     legend.appendChild(item);
