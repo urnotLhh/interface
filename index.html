@@ -153,14 +153,13 @@
               type="url"
               id="neo4jUrl"
               placeholder="http://localhost:7474/browser/"
-              value="http://localhost:7474/browser/"
             />
             <label for="neo4jImage" class="upload-label">选择示例图片</label>
             <input type="file" id="neo4jImage" accept="image/*" />
           </div>
           <div id="neo4jPreview" class="neo4j-preview placeholder">
             当前处于嵌入模式，如需展示请确保浏览器允许访问
-            <code>http://localhost:7474</code>
+            <code id="neo4jHostHint">http://localhost:7474</code>
           </div>
         </section>
 

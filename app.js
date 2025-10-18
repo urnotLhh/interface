@@ -7,6 +7,7 @@ const useRecognizedDevices = document.getElementById("useRecognizedDevices");
 const neo4jPreview = document.getElementById("neo4jPreview");
 const neo4jUrlInput = document.getElementById("neo4jUrl");
 const neo4jImageInput = document.getElementById("neo4jImage");
+const neo4jHostHint = document.getElementById("neo4jHostHint");
 const vulnTime = document.getElementById("vulnTime");
 const assessmentForm = document.getElementById("assessmentForm");
 const assessmentModeInputs = document.querySelectorAll('input[name="assessmentMode"]');
@@ -93,11 +94,41 @@ const API_ENDPOINTS = {
   analysis: "/api/cpe-mapping",
 };
 
+const DEFAULT_NEO4J_URL = getDefaultNeo4jUrl();
+
 function clone(data) {
   if (typeof structuredClone === "function") {
     return structuredClone(data);
   }
   return JSON.parse(JSON.stringify(data));
+}
+
+function getDefaultNeo4jUrl() {
+  const { protocol, hostname } = window.location;
+  const sanitizedHost = hostname || "localhost";
+  const isSecure = protocol === "https:";
+  const neo4jProtocol = isSecure ? "https:" : "http:";
+  const neo4jPort = isSecure ? 7473 : 7474;
+  return `${neo4jProtocol}//${sanitizedHost}:${neo4jPort}/browser/`;
+}
+
+function sanitizeForHtml(value) {
+  const input = String(value ?? "");
+  return input
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function updateNeo4jHostHint(url) {
+  if (!neo4jHostHint) {
+    return;
+  }
+  const source = url && url.trim() ? url.trim() : DEFAULT_NEO4J_URL;
+  const hostText = source.replace(/\/browser\/?$/, "");
+  neo4jHostHint.textContent = hostText;
 }
 
 function getActiveAssessmentMode() {
@@ -521,10 +552,27 @@ function resetDashboard() {
 
 function handleNeo4jModeChange(mode) {
   if (mode === "embed") {
+    const targetUrl = neo4jUrlInput.value?.trim();
+    if (!targetUrl) {
+      neo4jPreview.innerHTML =
+        '<div class="placeholder">请输入 Neo4j 浏览器地址，例如 <code>' +
+        sanitizeForHtml(DEFAULT_NEO4J_URL) +
+        "</code></div>";
+      neo4jPreview.classList.add("placeholder");
+      return;
+    }
+
     neo4jPreview.innerHTML = "";
     const iframe = document.createElement("iframe");
-    iframe.src = neo4jUrlInput.value || "http://localhost:7474/browser/";
+    iframe.src = targetUrl;
     iframe.title = "Neo4j 浏览器";
+    iframe.addEventListener("error", () => {
+      neo4jPreview.innerHTML =
+        '<div class="alert">无法加载 Neo4j 浏览器地址 <code>' +
+        sanitizeForHtml(targetUrl) +
+        "</code>。请确认服务已启动并允许从当前主机访问。</div>";
+      neo4jPreview.classList.add("placeholder");
+    });
     neo4jPreview.appendChild(iframe);
     neo4jPreview.classList.remove("placeholder");
   } else {
@@ -547,6 +595,20 @@ function handleNeo4jImageUpload(file) {
 }
 
 function initNeo4jSection() {
+  if (!neo4jUrlInput || !neo4jPreview) {
+    return;
+  }
+
+  if (!neo4jUrlInput.value) {
+    neo4jUrlInput.value = DEFAULT_NEO4J_URL;
+  }
+
+  if (!neo4jUrlInput.placeholder || neo4jUrlInput.placeholder.includes("localhost:7474")) {
+    neo4jUrlInput.placeholder = DEFAULT_NEO4J_URL;
+  }
+
+  updateNeo4jHostHint(neo4jUrlInput.value);
+
   document.querySelectorAll('input[name="neo4jMode"]').forEach((input) => {
     input.addEventListener("change", (event) => {
       const mode = event.target.value;
@@ -556,7 +618,14 @@ function initNeo4jSection() {
     });
   });
 
-  neo4jUrlInput.addEventListener("change", () => handleNeo4jModeChange("embed"));
+  neo4jUrlInput.addEventListener("input", (event) => {
+    updateNeo4jHostHint(event.target.value);
+  });
+
+  neo4jUrlInput.addEventListener("change", () => {
+    updateNeo4jHostHint(neo4jUrlInput.value);
+    handleNeo4jModeChange("embed");
+  });
   neo4jImageInput.addEventListener("change", (event) => handleNeo4jImageUpload(event.target.files[0]));
 
   handleNeo4jModeChange("embed");
