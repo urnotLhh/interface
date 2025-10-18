@@ -148,18 +148,18 @@
             </label>
           </div>
           <div class="neo4j-config">
-            <label for="neo4jUrl">Neo4j URL</label>
+            <label for="neo4jUrl">Neo4j 连接地址</label>
             <input
-              type="url"
+              type="text"
               id="neo4jUrl"
-              placeholder="http://localhost:7474/browser/"
+              placeholder="bolt://localhost:7687/neo4j"
             />
             <label for="neo4jImage" class="upload-label">选择示例图片</label>
             <input type="file" id="neo4jImage" accept="image/*" />
           </div>
           <div id="neo4jPreview" class="neo4j-preview placeholder">
             当前处于嵌入模式，如需展示请确保浏览器允许访问
-            <code id="neo4jHostHint">http://localhost:7474</code>
+            <code id="neo4jHostHint">bolt://localhost:7687</code>
           </div>
         </section>
 
