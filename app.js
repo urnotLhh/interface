@@ -7,6 +7,7 @@ const useRecognizedDevices = document.getElementById("useRecognizedDevices");
 const neo4jPreview = document.getElementById("neo4jPreview");
 const neo4jImageInput = document.getElementById("neo4jImage");
 const neo4jModeInputs = document.querySelectorAll('input[name="neo4jMode"]');
+const neo4jLinkColorInput = document.getElementById("neo4jLinkColor");
 const vulnTime = document.getElementById("vulnTime");
 const assessmentForm = document.getElementById("assessmentForm");
 const assessmentModeInputs = document.querySelectorAll('input[name="assessmentMode"]');
@@ -92,6 +93,10 @@ const API_ENDPOINTS = {
   vulnerability: "/api/vulnerabilities",
   analysis: "/api/cpe-mapping",
 };
+
+const DEFAULT_NEO4J_LINK_COLOR = "#64748b";
+const DEFAULT_NEO4J_LINK_WIDTH = 3.2;
+let currentNeo4jLinkColor = DEFAULT_NEO4J_LINK_COLOR;
 
 const neo4jDemoGraph = {
   width: 960,
@@ -770,23 +775,43 @@ function renderNeo4jDemoGraph() {
     role: "img",
     "aria-label": "D-Link 设备及漏洞关联的模拟图谱",
   });
+  const baseLinkColor = currentNeo4jLinkColor || DEFAULT_NEO4J_LINK_COLOR;
+  svg.style.setProperty("--neo4j-link-color", baseLinkColor);
+  svg.style.setProperty("--neo4j-link-width", `${DEFAULT_NEO4J_LINK_WIDTH}`);
 
   const defs = createSvgElement("defs");
-  const marker = createSvgElement("marker", {
-    id: "neo4j-arrowhead",
-    viewBox: "0 0 12 12",
-    refX: "12",
-    refY: "6",
-    markerWidth: "12",
-    markerHeight: "12",
-    orient: "auto-start-reverse",
-  });
-  const markerPath = createSvgElement("path", {
-    d: "M0,0 L12,6 L0,12 z",
-    fill: "currentColor",
-  });
-  marker.appendChild(markerPath);
-  defs.appendChild(marker);
+  const markerCache = new Map();
+
+  function ensureArrowMarker(color) {
+    const key = (color ?? baseLinkColor).toLowerCase();
+    if (markerCache.has(key)) {
+      return markerCache.get(key);
+    }
+
+    const sanitized = key.replace(/[^a-z0-9]+/g, "");
+    const markerId = `neo4j-arrowhead-${sanitized || markerCache.size}`;
+    const marker = createSvgElement("marker", {
+      id: markerId,
+      viewBox: "0 0 12 12",
+      refX: "11",
+      refY: "6",
+      markerWidth: "12",
+      markerHeight: "12",
+      orient: "auto",
+      "markerUnits": "strokeWidth",
+    });
+    const markerPath = createSvgElement("path", {
+      d: "M0,1 L11,6 L0,11 z",
+      fill: color,
+      stroke: color,
+      "stroke-linejoin": "round",
+    });
+    marker.appendChild(markerPath);
+    defs.appendChild(marker);
+    markerCache.set(key, markerId);
+    return markerId;
+  }
+
   svg.appendChild(defs);
 
   const linkGroup = createSvgElement("g", { class: "neo4j-links" });
@@ -799,12 +824,19 @@ function renderNeo4jDemoGraph() {
       return;
     }
 
+    const strokeColor = link.color ?? baseLinkColor;
+    const strokeWidth = link.width ?? DEFAULT_NEO4J_LINK_WIDTH;
+    const markerId = ensureArrowMarker(strokeColor);
     const line = createSvgElement("line", {
       x1: source.x,
       y1: source.y,
       x2: target.x,
       y2: target.y,
-      "marker-end": "url(#neo4j-arrowhead)",
+      stroke: strokeColor,
+      "stroke-width": strokeWidth,
+      "stroke-linecap": "round",
+      "stroke-linejoin": "round",
+      "marker-end": `url(#${markerId})`,
     });
     linkGroup.appendChild(line);
 
@@ -921,6 +953,10 @@ function handleNeo4jModeChange(mode) {
     return;
   }
 
+  if (neo4jLinkColorInput) {
+    neo4jLinkColorInput.disabled = mode !== "demo";
+  }
+
   if (mode === "demo") {
     renderNeo4jDemoGraph();
     return;
@@ -974,6 +1010,20 @@ function initNeo4jSection() {
     neo4jImageInput.addEventListener("change", (event) =>
       handleNeo4jImageUpload(event.target.files[0])
     );
+  }
+
+  if (neo4jLinkColorInput) {
+    neo4jLinkColorInput.value = currentNeo4jLinkColor;
+    neo4jLinkColorInput.addEventListener("input", (event) => {
+      const { value } = event.target;
+      currentNeo4jLinkColor = value || DEFAULT_NEO4J_LINK_COLOR;
+      if (!value) {
+        event.target.value = DEFAULT_NEO4J_LINK_COLOR;
+      }
+      if (neo4jPreview.classList.contains("graph-mode")) {
+        renderNeo4jDemoGraph();
+      }
+    });
   }
 
   const initialMode = inputs.find((input) => input.checked)?.value ?? "demo";
