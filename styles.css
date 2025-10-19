@@ -659,48 +659,6 @@ button:disabled {
   align-items: stretch;
 }
 
-.neo4j-style-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  padding: 0.8rem;
-  border-radius: 0.75rem;
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  background: rgba(241, 245, 249, 0.45);
-  font-size: 0.78rem;
-  color: #475569;
-}
-
-.neo4j-style-controls label {
-  font-weight: 600;
-  color: #1f2937;
-}
-
-.neo4j-style-controls input[type="color"] {
-  width: 100%;
-  min-height: 2.2rem;
-  border: 1px solid rgba(148, 163, 184, 0.5);
-  border-radius: 0.5rem;
-  background: #fff;
-  cursor: pointer;
-  padding: 0;
-}
-
-.neo4j-style-controls input[type="color"]:focus {
-  outline: 2px solid rgba(37, 99, 235, 0.35);
-  outline-offset: 2px;
-}
-
-.neo4j-style-controls input[type="color"]:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.neo4j-style-note {
-  font-size: 0.7rem;
-  color: #64748b;
-}
-
 .neo4j-hint {
   display: flex;
   flex-direction: column;
@@ -806,21 +764,19 @@ button:disabled {
   width: 100%;
   height: auto;
   max-height: 420px;
-  color: rgba(148, 163, 184, 0.55);
+  color: #cbdcfb;
   background: #fff;
   border-radius: 0.85rem;
   border: 1px solid rgba(148, 163, 184, 0.25);
   overflow: visible;
-  --neo4j-link-color: #64748b;
-  --neo4j-link-width: 3.2;
 }
 
 .neo4j-links line {
-  stroke: var(--neo4j-link-color, currentColor);
-  stroke-width: var(--neo4j-link-width, 3.2);
+  stroke-width: 3.2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  opacity: 0.9;
+  opacity: 0.94;
+  filter: drop-shadow(0 0 3px rgba(148, 197, 255, 0.45));
 }
 
 .neo4j-link-labels text {

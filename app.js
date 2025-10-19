@@ -7,7 +7,6 @@ const useRecognizedDevices = document.getElementById("useRecognizedDevices");
 const neo4jPreview = document.getElementById("neo4jPreview");
 const neo4jImageInput = document.getElementById("neo4jImage");
 const neo4jModeInputs = document.querySelectorAll('input[name="neo4jMode"]');
-const neo4jLinkColorInput = document.getElementById("neo4jLinkColor");
 const vulnTime = document.getElementById("vulnTime");
 const assessmentForm = document.getElementById("assessmentForm");
 const assessmentModeInputs = document.querySelectorAll('input[name="assessmentMode"]');
@@ -94,9 +93,14 @@ const API_ENDPOINTS = {
   analysis: "/api/cpe-mapping",
 };
 
-const DEFAULT_NEO4J_LINK_COLOR = "#64748b";
+const NEO4J_LINK_COLORS = {
+  base: "#dbeafe",
+  accent: "#60a5fa",
+  cpe: "#bcd7ff",
+  type: "#e8f0ff",
+  banner: "#ef4444",
+};
 const DEFAULT_NEO4J_LINK_WIDTH = 3.2;
-let currentNeo4jLinkColor = DEFAULT_NEO4J_LINK_COLOR;
 
 const neo4jDemoGraph = {
   width: 960,
@@ -198,21 +202,21 @@ const neo4jDemoGraph = {
       source: "alpha",
       target: "dcs930l",
       label: "banner_影响_cpe",
-      color: "#ef4444",
+      color: NEO4J_LINK_COLORS.banner,
       labelOffset: { x: -30, y: -20 },
     },
     {
       source: "alpha",
       target: "dcs931l",
       label: "banner_影响_cpe",
-      color: "#ef4444",
+      color: NEO4J_LINK_COLORS.banner,
       labelOffset: { x: -34, y: -6 },
     },
     {
       source: "alpha",
       target: "dcs932l",
       label: "banner_影响_cpe",
-      color: "#ef4444",
+      color: NEO4J_LINK_COLORS.banner,
       labelOffset: { x: -36, y: 12 },
     },
     { source: "alpha", target: "dcs933l", label: "cpe_影响_设备", labelOffset: { x: -28, y: 12 } },
@@ -221,7 +225,7 @@ const neo4jDemoGraph = {
       source: "alpha",
       target: "dcs935l",
       label: "banner_影响_cpe",
-      color: "#ef4444",
+      color: NEO4J_LINK_COLORS.banner,
       labelOffset: { x: -26, y: 26 },
     },
     { source: "alpha", target: "dcs942l", label: "cpe_影响_设备", labelOffset: { x: -24, y: -6 } },
@@ -229,7 +233,7 @@ const neo4jDemoGraph = {
       source: "alpha",
       target: "dcs900",
       label: "banner_影响_cpe",
-      color: "#ef4444",
+      color: NEO4J_LINK_COLORS.banner,
       labelOffset: { x: -18, y: 2 },
     },
     { source: "alpha", target: "dshc310", label: "cpe_影响_设备", labelOffset: { x: -18, y: 18 } },
@@ -237,7 +241,7 @@ const neo4jDemoGraph = {
       source: "alpha",
       target: "dcs25",
       label: "banner_影响_cpe",
-      color: "#ef4444",
+      color: NEO4J_LINK_COLORS.banner,
       labelOffset: { x: -34, y: 32 },
     },
     { source: "dcs-series", target: "dcs930l", label: "型号", labelOffset: { x: -20, y: -22 } },
@@ -811,15 +815,14 @@ function renderNeo4jDemoGraph() {
     role: "img",
     "aria-label": "D-Link 设备及漏洞关联的模拟图谱",
   });
-  const baseLinkColor = currentNeo4jLinkColor || DEFAULT_NEO4J_LINK_COLOR;
-  svg.style.setProperty("--neo4j-link-color", baseLinkColor);
-  svg.style.setProperty("--neo4j-link-width", `${DEFAULT_NEO4J_LINK_WIDTH}`);
+  const fallbackLinkColor = NEO4J_LINK_COLORS.base;
 
   const defs = createSvgElement("defs");
   const markerCache = new Map();
 
   function ensureArrowMarker(color) {
-    const key = (color ?? baseLinkColor).toLowerCase();
+    const resolvedColor = color ?? fallbackLinkColor;
+    const key = resolvedColor.toLowerCase();
     if (markerCache.has(key)) {
       return markerCache.get(key);
     }
@@ -829,17 +832,17 @@ function renderNeo4jDemoGraph() {
     const marker = createSvgElement("marker", {
       id: markerId,
       viewBox: "0 0 12 12",
-      refX: "10",
+      refX: "10.5",
       refY: "6",
-      markerWidth: "3.2",
-      markerHeight: "3.2",
+      markerWidth: "3.6",
+      markerHeight: "3.6",
       orient: "auto",
       "markerUnits": "strokeWidth",
     });
     const markerPath = createSvgElement("path", {
-      d: "M1,1 L10,6 L1,11 z",
-      fill: color,
-      stroke: color,
+      d: "M2,1 L11,6 L2,11 z",
+      fill: resolvedColor,
+      stroke: resolvedColor,
       "stroke-linejoin": "round",
     });
     marker.appendChild(markerPath);
@@ -860,7 +863,19 @@ function renderNeo4jDemoGraph() {
       return;
     }
 
-    const strokeColor = link.color ?? baseLinkColor;
+    const labelText = (link.label ?? "").toLowerCase();
+    let strokeColor = link.color;
+    if (!strokeColor) {
+      if (labelText.includes("ca_")) {
+        strokeColor = NEO4J_LINK_COLORS.accent;
+      } else if (labelText.includes("cpe_")) {
+        strokeColor = NEO4J_LINK_COLORS.cpe;
+      } else if (labelText.includes("型号")) {
+        strokeColor = NEO4J_LINK_COLORS.type;
+      } else {
+        strokeColor = fallbackLinkColor;
+      }
+    }
     const strokeWidth = link.width ?? DEFAULT_NEO4J_LINK_WIDTH;
     const markerId = ensureArrowMarker(strokeColor);
     const line = createSvgElement("line", {
@@ -989,10 +1004,6 @@ function handleNeo4jModeChange(mode) {
     return;
   }
 
-  if (neo4jLinkColorInput) {
-    neo4jLinkColorInput.disabled = mode !== "demo";
-  }
-
   if (mode === "demo") {
     renderNeo4jDemoGraph();
     return;
@@ -1046,20 +1057,6 @@ function initNeo4jSection() {
     neo4jImageInput.addEventListener("change", (event) =>
       handleNeo4jImageUpload(event.target.files[0])
     );
-  }
-
-  if (neo4jLinkColorInput) {
-    neo4jLinkColorInput.value = currentNeo4jLinkColor;
-    neo4jLinkColorInput.addEventListener("input", (event) => {
-      const { value } = event.target;
-      currentNeo4jLinkColor = value || DEFAULT_NEO4J_LINK_COLOR;
-      if (!value) {
-        event.target.value = DEFAULT_NEO4J_LINK_COLOR;
-      }
-      if (neo4jPreview.classList.contains("graph-mode")) {
-        renderNeo4jDemoGraph();
-      }
-    });
   }
 
   const initialMode = inputs.find((input) => input.checked)?.value ?? "demo";
