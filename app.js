@@ -39,6 +39,21 @@ const mockData = {
       firmware: "V8.2.1",
       serial: "SCM-38210",
     },
+    stats: {
+      totalDevices: 13609,
+      topDevices: [
+        { name: "printer/hp", count: 2299, percentage: 16.9 },
+        { name: "router/intelbras", count: 1203, percentage: 8.8 },
+        { name: "router/bec", count: 876, percentage: 6.4 },
+        { name: "gateway/zyxel", count: 709, percentage: 5.2 },
+        { name: "router/tp-link", count: 543, percentage: 4.0 },
+        { name: "router/netgear", count: 543, percentage: 4.0 },
+        { name: "router/zyxel", count: 477, percentage: 3.5 },
+        { name: "router/d-link", count: 307, percentage: 2.3 },
+        { name: "printer/kyocera", count: 261, percentage: 1.9 },
+        { name: "modem/tp-link", count: 185, percentage: 1.4 },
+      ],
+    },
   },
   vulnerabilities: [
     {
@@ -91,6 +106,21 @@ const API_ENDPOINTS = {
   analysis: "/api/cpe-mapping",
 };
 
+const DEVICE_STATS_COLORS = [
+  "#2563eb",
+  "#38bdf8",
+  "#22c55e",
+  "#f97316",
+  "#facc15",
+  "#a855f7",
+  "#ec4899",
+  "#14b8a6",
+  "#f87171",
+  "#6366f1",
+  "#0ea5e9",
+  "#94a3b8",
+];
+
 
 
 function clone(data) {
@@ -108,6 +138,20 @@ function sanitizeForHtml(value) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
+}
+
+function formatNumber(value) {
+  if (typeof value !== "number" || Number.isNaN(value)) {
+    return "-";
+  }
+  return value.toLocaleString("zh-CN");
+}
+
+function formatPercentage(value) {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return "-";
+  }
+  return `${value.toFixed(1)}%`;
 }
 
 function getActiveAssessmentMode() {
@@ -333,8 +377,224 @@ function renderRecognition(recognition) {
     container.appendChild(secondaryList);
   }
 
+  if (recognition.stats) {
+    renderDeviceStatistics(container, recognition.stats);
+  }
+
   deviceRecognition.innerHTML = "";
   deviceRecognition.appendChild(container);
+}
+
+function renderDeviceStatistics(parent, stats) {
+  const dataset = prepareDeviceStatsDataset(stats);
+  if (!dataset.entries.length || dataset.total <= 0) {
+    return;
+  }
+
+  const section = document.createElement("div");
+  section.className = "device-stats";
+
+  const title = document.createElement("h4");
+  title.textContent = "设备识别统计";
+  section.appendChild(title);
+
+  const summary = document.createElement("p");
+  summary.className = "stats-summary";
+  summary.textContent = `共扫描 ${formatNumber(dataset.total)} 个设备，以下为数量排名前十的设备类型：`;
+  section.appendChild(summary);
+
+  const visual = document.createElement("div");
+  visual.className = "stats-visual";
+  visual.appendChild(createPieChartElement(dataset));
+  visual.appendChild(createLegendElement(dataset));
+  section.appendChild(visual);
+
+  section.appendChild(createStatsTable(dataset));
+
+  parent.appendChild(section);
+}
+
+function prepareDeviceStatsDataset(stats) {
+  if (!stats) {
+    return { total: 0, entries: [], topEntries: [] };
+  }
+
+  const total = Number(stats.totalDevices) || 0;
+  const topDevices = Array.isArray(stats.topDevices) ? stats.topDevices : [];
+
+  const entries = topDevices
+    .map((item) => {
+      const count = Number(item.count) || 0;
+      if (count <= 0) {
+        return null;
+      }
+      const percentage =
+        typeof item.percentage === "number"
+          ? item.percentage
+          : total > 0
+          ? (count / total) * 100
+          : 0;
+      const label = item.label ?? item.name ?? item.type ?? "未知设备";
+      return { label, count, percentage, isOther: false };
+    })
+    .filter(Boolean);
+
+  const sumCounts = entries.reduce((sum, entry) => sum + entry.count, 0);
+  const remainder = total - sumCounts;
+
+  if (remainder > 0) {
+    entries.push({
+      label: "其他",
+      count: remainder,
+      percentage: total > 0 ? (remainder / total) * 100 : 0,
+      isOther: true,
+    });
+  }
+
+  entries.forEach((entry, index) => {
+    entry.color = DEVICE_STATS_COLORS[index % DEVICE_STATS_COLORS.length];
+  });
+
+  return {
+    total,
+    entries,
+    topEntries: entries.filter((entry) => !entry.isOther),
+    otherEntry: entries.find((entry) => entry.isOther),
+  };
+}
+
+function createPieChartElement(dataset) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "pie-wrapper";
+
+  const pie = document.createElement("div");
+  pie.className = "pie-chart";
+
+  const segments = [];
+  let cumulative = 0;
+
+  dataset.entries.forEach((entry, index) => {
+    const ratio = dataset.total > 0 ? entry.count / dataset.total : 0;
+    const start = (cumulative * 100).toFixed(2);
+    cumulative += ratio;
+    const end = index === dataset.entries.length - 1 ? 100 : (cumulative * 100).toFixed(2);
+    segments.push(`${entry.color} ${start}% ${end}%`);
+  });
+
+  pie.style.background = segments.length
+    ? `conic-gradient(${segments.join(", ")})`
+    : "var(--bg-elevated)";
+
+  const center = document.createElement("div");
+  center.className = "pie-center";
+  center.innerHTML = `<strong>${formatNumber(dataset.total)}</strong><span>设备总数</span>`;
+  pie.appendChild(center);
+
+  wrapper.appendChild(pie);
+  return wrapper;
+}
+
+function createLegendElement(dataset) {
+  const legend = document.createElement("ul");
+  legend.className = "pie-legend";
+
+  dataset.entries.forEach((entry) => {
+    const item = document.createElement("li");
+    item.className = "legend-item";
+    if (entry.isOther) {
+      item.classList.add("is-other");
+    }
+
+    const swatch = document.createElement("span");
+    swatch.className = "legend-swatch";
+    swatch.style.setProperty("--swatch-color", entry.color);
+    item.appendChild(swatch);
+
+    const meta = document.createElement("div");
+    meta.className = "legend-meta";
+
+    const label = document.createElement("strong");
+    label.textContent = entry.label;
+    meta.appendChild(label);
+
+    const detail = document.createElement("span");
+    detail.textContent = `${formatNumber(entry.count)} 台 · ${formatPercentage(entry.percentage)}`;
+    meta.appendChild(detail);
+
+    item.appendChild(meta);
+    legend.appendChild(item);
+  });
+
+  return legend;
+}
+
+function createStatsTable(dataset) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "stats-table-wrapper";
+
+  const table = document.createElement("table");
+  table.className = "stats-table";
+
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>排名</th>
+        <th>设备类型</th>
+        <th>数量</th>
+        <th>占比</th>
+      </tr>
+    </thead>
+  `;
+
+  const tbody = document.createElement("tbody");
+  dataset.topEntries.forEach((entry, index) => {
+    const tr = document.createElement("tr");
+
+    const rank = document.createElement("td");
+    rank.textContent = index + 1;
+    tr.appendChild(rank);
+
+    const label = document.createElement("td");
+    label.textContent = entry.label;
+    tr.appendChild(label);
+
+    const count = document.createElement("td");
+    count.textContent = `${formatNumber(entry.count)} 台`;
+    tr.appendChild(count);
+
+    const percentage = document.createElement("td");
+    percentage.textContent = formatPercentage(entry.percentage);
+    tr.appendChild(percentage);
+
+    tbody.appendChild(tr);
+  });
+
+  if (dataset.otherEntry) {
+    const tr = document.createElement("tr");
+    tr.className = "other-row";
+
+    const rank = document.createElement("td");
+    rank.textContent = "-";
+    tr.appendChild(rank);
+
+    const label = document.createElement("td");
+    label.textContent = dataset.otherEntry.label;
+    tr.appendChild(label);
+
+    const count = document.createElement("td");
+    count.textContent = `${formatNumber(dataset.otherEntry.count)} 台`;
+    tr.appendChild(count);
+
+    const percentage = document.createElement("td");
+    percentage.textContent = formatPercentage(dataset.otherEntry.percentage);
+    tr.appendChild(percentage);
+
+    tbody.appendChild(tr);
+  }
+
+  table.appendChild(tbody);
+  wrapper.appendChild(table);
+  return wrapper;
 }
 
 function translateMetaKey(key) {
