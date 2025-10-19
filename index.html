@@ -133,32 +133,22 @@
             <div>
               <h2 id="neo4j-title">Neo4j漏洞库</h2>
               <p class="description">
-                内置示例图谱展示 D-Link 设备与漏洞之间的关系，也可上传自定义图片。
+                上传来自 Neo4j 的图谱截图或导出图片，展示实际的资产与漏洞关系。
               </p>
             </div>
           </div>
-          <div class="neo4j-controls">
-            <label>
-              <input type="radio" name="neo4jMode" value="demo" checked />
-              使用内置模拟图谱
-            </label>
-            <label>
-              <input type="radio" name="neo4jMode" value="image" />
-              使用示例图片
-            </label>
-          </div>
           <div class="neo4j-config">
             <div class="neo4j-hint">
-              <strong>模拟数据概览：</strong>
+              <strong>使用说明：</strong>
               <span>
-                复刻 D-Link 厂商、alpha 标记、摄像头型号与漏洞公告之间的拓扑结构，节点颜色与关系名称均对应原始 Neo4j 图示。
+                在 Neo4j 浏览器或 Bloom 中生成图谱后，将截图或导出的图片上传至此处，即可在面板中展示真实数据库的可视化结果。
               </span>
             </div>
-            <label for="neo4jImage" class="upload-label">选择示例图片</label>
+            <label for="neo4jImage" class="upload-label">上传 Neo4j 图谱截图</label>
             <input type="file" id="neo4jImage" accept="image/*" />
           </div>
           <div id="neo4jPreview" class="neo4j-preview placeholder">
-            正在准备内置示例图谱…
+            等待上传 Neo4j 图谱截图
           </div>
         </section>
 

@@ -642,16 +642,6 @@ button:disabled {
   }
 }
 
-.neo4j-controls {
-  display: flex;
-  gap: 0.8rem;
-  font-size: 0.8rem;
-}
-
-.neo4j-controls input {
-  margin-right: 0.35rem;
-}
-
 .neo4j-config {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -689,15 +679,6 @@ button:disabled {
   padding: 0.85rem;
 }
 
-.neo4j-preview.graph-mode {
-  padding: 0;
-  align-items: stretch;
-  justify-content: stretch;
-  background: #fff;
-  border-color: rgba(148, 163, 184, 0.35);
-}
-
-.neo4j-preview iframe,
 .neo4j-preview img {
   width: 100%;
   height: 100%;
@@ -747,119 +728,6 @@ button:disabled {
   display: none;
 }
 
-
-.neo4j-preview .neo4j-demo {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  width: 100%;
-  padding: 1rem;
-  background: #fff;
-  border-radius: 1rem;
-  border: 1px solid rgba(148, 163, 184, 0.25);
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
-}
-
-.neo4j-demo-canvas {
-  width: 100%;
-  height: auto;
-  max-height: 420px;
-  color: #cbdcfb;
-  background: #fff;
-  border-radius: 0.85rem;
-  border: 1px solid rgba(148, 163, 184, 0.25);
-  overflow: visible;
-}
-
-.neo4j-links line {
-  stroke-width: 3.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  opacity: 0.94;
-  filter: drop-shadow(0 0 3px rgba(148, 197, 255, 0.45));
-}
-
-.neo4j-link-labels text {
-  fill: #475569;
-  font-size: 0.7rem;
-  text-anchor: middle;
-  paint-order: stroke;
-  stroke: rgba(255, 255, 255, 0.9);
-  stroke-width: 4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.neo4j-nodes text {
-  fill: #1f2937;
-  font-size: 0.7rem;
-  text-anchor: middle;
-  dominant-baseline: middle;
-  font-weight: 600;
-}
-
-.neo4j-node {
-  cursor: grab;
-  touch-action: none;
-}
-
-.neo4j-node.is-dragging {
-  cursor: grabbing;
-}
-
-.neo4j-demo-canvas--dragging {
-  cursor: grabbing;
-}
-
-.neo4j-node circle {
-  fill: var(--neo4j-node-fill, #e2e8f0);
-  stroke: var(--neo4j-node-stroke, rgba(148, 163, 184, 0.6));
-  stroke-width: 1.6;
-  filter: drop-shadow(0 6px 12px rgba(15, 23, 42, 0.08));
-  transition: filter 0.2s ease;
-}
-
-.neo4j-node:hover circle,
-.neo4j-node.is-dragging circle {
-  filter: drop-shadow(0 10px 18px rgba(15, 23, 42, 0.12));
-}
-
-.neo4j-demo-caption {
-  font-size: 0.75rem;
-  color: #4b5563;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.neo4j-demo-caption strong {
-  color: #1f2937;
-}
-
-.neo4j-demo-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem 1.2rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.neo4j-demo-legend li {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  color: #475569;
-  font-size: 0.72rem;
-}
-
-.legend-swatch {
-  width: 0.75rem;
-  height: 0.75rem;
-  border-radius: 999px;
-  border: 1px solid var(--legend-stroke, rgba(148, 163, 184, 0.6));
-  background: var(--legend-color, #e2e8f0);
-}
 
 .badge.neutral {
   background: rgba(148, 163, 184, 0.7);
