@@ -735,16 +735,45 @@ function renderNeo4jDemoGraph() {
     adjacency.get(nodeId).push(record);
   }
 
+  function computeLinkEndpoints(source, target, meta = {}) {
+    const dx = target.x - source.x;
+    const dy = target.y - source.y;
+    const distance = Math.hypot(dx, dy) || 1;
+
+    let sourcePadding =
+      meta.sourcePadding ?? Math.max(0, (source.radius ?? 0) * 0.65 + 6);
+    let targetPadding =
+      meta.targetPadding ?? Math.max(0, (target.radius ?? 0) + 10);
+
+    const maxTotal = Math.max(0, distance - 2);
+    if (sourcePadding + targetPadding > maxTotal && maxTotal > 0) {
+      const scale = maxTotal / (sourcePadding + targetPadding);
+      sourcePadding *= scale;
+      targetPadding *= scale;
+    }
+
+    const ux = dx / distance;
+    const uy = dy / distance;
+
+    return {
+      x1: source.x + ux * sourcePadding,
+      y1: source.y + uy * sourcePadding,
+      x2: target.x - ux * targetPadding,
+      y2: target.y - uy * targetPadding,
+    };
+  }
+
   function updateLinkPosition(record) {
     const { line, label, source, target, meta } = record;
-    line.setAttribute("x1", source.x);
-    line.setAttribute("y1", source.y);
-    line.setAttribute("x2", target.x);
-    line.setAttribute("y2", target.y);
+    const { x1, y1, x2, y2 } = computeLinkEndpoints(source, target, meta);
+    line.setAttribute("x1", x1);
+    line.setAttribute("y1", y1);
+    line.setAttribute("x2", x2);
+    line.setAttribute("y2", y2);
 
     if (label) {
-      const midX = (source.x + target.x) / 2;
-      const midY = (source.y + target.y) / 2;
+      const midX = (x1 + x2) / 2;
+      const midY = (y1 + y2) / 2;
       const offsetX = meta.labelOffset?.x ?? 0;
       const offsetY = meta.labelOffset?.y ?? -8;
       label.setAttribute("x", midX + offsetX);
@@ -865,11 +894,21 @@ function renderNeo4jDemoGraph() {
     }
     const strokeWidth = link.width ?? DEFAULT_NEO4J_LINK_WIDTH;
     const markerId = ensureArrowMarker(strokeColor);
+    const meta = {
+      ...link,
+      sourcePadding:
+        link.sourcePadding ?? Math.max(0, (source.radius ?? 0) * 0.65 + 6),
+      targetPadding:
+        link.targetPadding ?? Math.max(0, (target.radius ?? 0) + 10),
+    };
+
+    const { x1, y1, x2, y2 } = computeLinkEndpoints(source, target, meta);
+
     const line = createSvgElement("line", {
-      x1: source.x,
-      y1: source.y,
-      x2: target.x,
-      y2: target.y,
+      x1,
+      y1,
+      x2,
+      y2,
       stroke: strokeColor,
       "stroke-width": strokeWidth,
       "stroke-linecap": "round",
@@ -880,8 +919,8 @@ function renderNeo4jDemoGraph() {
 
     let label = null;
     if (link.label) {
-      const midX = (source.x + target.x) / 2;
-      const midY = (source.y + target.y) / 2;
+      const midX = (x1 + x2) / 2;
+      const midY = (y1 + y2) / 2;
       label = createSvgElement("text", {
         x: midX + (link.labelOffset?.x ?? 0),
         y: midY + (link.labelOffset?.y ?? -8),
@@ -890,7 +929,7 @@ function renderNeo4jDemoGraph() {
       labelGroup.appendChild(label);
     }
 
-    const record = { line, label, source, target, meta: link };
+    const record = { line, label, source, target, meta };
     registerLink(link.source, record);
     registerLink(link.target, record);
   });
