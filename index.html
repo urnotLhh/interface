@@ -133,14 +133,14 @@
             <div>
               <h2 id="neo4j-title">Neo4j漏洞库</h2>
               <p class="description">
-                嵌入 Neo4j 控制台或上传示例图，快速呈现资产之间的关联关系。
+                内置示例图谱展示 D-Link 设备与漏洞之间的关系，也可上传自定义图片。
               </p>
             </div>
           </div>
           <div class="neo4j-controls">
             <label>
-              <input type="radio" name="neo4jMode" value="embed" checked />
-              嵌入 Neo4j 页面
+              <input type="radio" name="neo4jMode" value="demo" checked />
+              使用内置模拟图谱
             </label>
             <label>
               <input type="radio" name="neo4jMode" value="image" />
@@ -148,18 +148,17 @@
             </label>
           </div>
           <div class="neo4j-config">
-            <label for="neo4jUrl">Neo4j URL</label>
-            <input
-              type="url"
-              id="neo4jUrl"
-              placeholder="http://localhost:7474/browser/"
-            />
+            <div class="neo4j-hint">
+              <strong>模拟数据概览：</strong>
+              <span>
+                复刻 D-Link 厂商、alpha 标记、摄像头型号与漏洞公告之间的拓扑结构，节点颜色与关系名称均对应原始 Neo4j 图示。
+              </span>
+            </div>
             <label for="neo4jImage" class="upload-label">选择示例图片</label>
             <input type="file" id="neo4jImage" accept="image/*" />
           </div>
           <div id="neo4jPreview" class="neo4j-preview placeholder">
-            当前处于嵌入模式，如需展示请确保浏览器允许访问
-            <code id="neo4jHostHint">http://localhost:7474</code>
+            正在准备内置示例图谱…
           </div>
         </section>
 
