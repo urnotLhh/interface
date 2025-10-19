@@ -789,6 +789,16 @@ function resetDashboard() {
   updateStatus("ready", initialStatus);
 }
 
+function preloadDemoRecognition() {
+  if (!USE_MOCK_DATA) {
+    return;
+  }
+
+  const data = clone(mockData);
+  renderAssessment(data);
+  updateStatus("ready", "演示数据已加载，可直接查看识别结果");
+}
+
 function showNeo4jPlaceholder(message) {
   if (!neo4jPreview) {
     return;
@@ -857,6 +867,7 @@ function bootstrap() {
   initEventListeners();
   initNeo4jSection();
   resetDashboard();
+  preloadDemoRecognition();
 }
 
 bootstrap();
