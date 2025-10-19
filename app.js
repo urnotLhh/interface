@@ -94,11 +94,8 @@ const API_ENDPOINTS = {
 };
 
 const NEO4J_LINK_COLORS = {
-  base: "#dbeafe",
-  accent: "#60a5fa",
-  cpe: "#bcd7ff",
-  type: "#e8f0ff",
-  banner: "#ef4444",
+  default: "#60a5fa",
+  cpe: "#ef4444",
 };
 const DEFAULT_NEO4J_LINK_WIDTH = 3.2;
 
@@ -202,21 +199,18 @@ const neo4jDemoGraph = {
       source: "alpha",
       target: "dcs930l",
       label: "banner_影响_cpe",
-      color: NEO4J_LINK_COLORS.banner,
       labelOffset: { x: -30, y: -20 },
     },
     {
       source: "alpha",
       target: "dcs931l",
       label: "banner_影响_cpe",
-      color: NEO4J_LINK_COLORS.banner,
       labelOffset: { x: -34, y: -6 },
     },
     {
       source: "alpha",
       target: "dcs932l",
       label: "banner_影响_cpe",
-      color: NEO4J_LINK_COLORS.banner,
       labelOffset: { x: -36, y: 12 },
     },
     { source: "alpha", target: "dcs933l", label: "cpe_影响_设备", labelOffset: { x: -28, y: 12 } },
@@ -225,7 +219,6 @@ const neo4jDemoGraph = {
       source: "alpha",
       target: "dcs935l",
       label: "banner_影响_cpe",
-      color: NEO4J_LINK_COLORS.banner,
       labelOffset: { x: -26, y: 26 },
     },
     { source: "alpha", target: "dcs942l", label: "cpe_影响_设备", labelOffset: { x: -24, y: -6 } },
@@ -233,7 +226,6 @@ const neo4jDemoGraph = {
       source: "alpha",
       target: "dcs900",
       label: "banner_影响_cpe",
-      color: NEO4J_LINK_COLORS.banner,
       labelOffset: { x: -18, y: 2 },
     },
     { source: "alpha", target: "dshc310", label: "cpe_影响_设备", labelOffset: { x: -18, y: 18 } },
@@ -241,7 +233,6 @@ const neo4jDemoGraph = {
       source: "alpha",
       target: "dcs25",
       label: "banner_影响_cpe",
-      color: NEO4J_LINK_COLORS.banner,
       labelOffset: { x: -34, y: 32 },
     },
     { source: "dcs-series", target: "dcs930l", label: "型号", labelOffset: { x: -20, y: -22 } },
@@ -815,7 +806,7 @@ function renderNeo4jDemoGraph() {
     role: "img",
     "aria-label": "D-Link 设备及漏洞关联的模拟图谱",
   });
-  const fallbackLinkColor = NEO4J_LINK_COLORS.base;
+  const fallbackLinkColor = NEO4J_LINK_COLORS.default;
 
   const defs = createSvgElement("defs");
   const markerCache = new Map();
@@ -866,12 +857,8 @@ function renderNeo4jDemoGraph() {
     const labelText = (link.label ?? "").toLowerCase();
     let strokeColor = link.color;
     if (!strokeColor) {
-      if (labelText.includes("ca_")) {
-        strokeColor = NEO4J_LINK_COLORS.accent;
-      } else if (labelText.includes("cpe_")) {
+      if (labelText.includes("cpe_影响_设备")) {
         strokeColor = NEO4J_LINK_COLORS.cpe;
-      } else if (labelText.includes("型号")) {
-        strokeColor = NEO4J_LINK_COLORS.type;
       } else {
         strokeColor = fallbackLinkColor;
       }
