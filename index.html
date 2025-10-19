@@ -141,14 +141,12 @@
             <div class="neo4j-hint">
               <strong>使用说明：</strong>
               <span>
-                在 Neo4j 浏览器或 Bloom 中生成图谱后，将截图或导出的图片上传至此处，即可在面板中展示真实数据库的可视化结果。
+                将真实 Neo4j 数据库生成的图谱图片命名为 <code>neo4j.png</code> 并放置在前端项目根目录（与 <code>index.html</code> 同级）下，页面将自动展示该图片。
               </span>
             </div>
-            <label for="neo4jImage" class="upload-label">上传 Neo4j 图谱截图</label>
-            <input type="file" id="neo4jImage" accept="image/*" />
           </div>
           <div id="neo4jPreview" class="neo4j-preview placeholder">
-            等待上传 Neo4j 图谱截图
+            正在查找 Neo4j 图谱图片
           </div>
         </section>
 

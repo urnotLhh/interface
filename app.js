@@ -5,7 +5,6 @@ const vulnerabilityResults = document.getElementById("vulnerabilityResults");
 const analysisResults = document.getElementById("analysisResults");
 const useRecognizedDevices = document.getElementById("useRecognizedDevices");
 const neo4jPreview = document.getElementById("neo4jPreview");
-const neo4jImageInput = document.getElementById("neo4jImage");
 const vulnTime = document.getElementById("vulnTime");
 const assessmentForm = document.getElementById("assessmentForm");
 const assessmentModeInputs = document.querySelectorAll('input[name="assessmentMode"]');
@@ -536,52 +535,34 @@ function showNeo4jPlaceholder(message) {
   }
   const placeholder = document.createElement("div");
   placeholder.className = "placeholder";
-  placeholder.textContent = message || "等待上传 Neo4j 图谱截图";
+  placeholder.textContent = message || "正在查找 Neo4j 图谱图片";
   neo4jPreview.innerHTML = "";
   neo4jPreview.appendChild(placeholder);
   neo4jPreview.classList.add("placeholder");
 }
 
-function handleNeo4jImageUpload(file) {
+function loadNeo4jImage() {
   if (!neo4jPreview) {
     return;
   }
-  if (!file) {
-    showNeo4jPlaceholder();
-    return;
-  }
-  if (file.type && !file.type.startsWith("image/")) {
-    showNeo4jPlaceholder("仅支持图片文件，请重新选择。");
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = (event) => {
-    const img = document.createElement("img");
-    img.src = event.target.result;
-    img.alt = file.name ? `Neo4j 图谱：${file.name}` : "Neo4j 图谱预览";
+  const img = document.createElement("img");
+  img.src = "neo4j.png";
+  img.alt = "Neo4j 图谱预览";
+  img.onload = () => {
     neo4jPreview.innerHTML = "";
     neo4jPreview.appendChild(img);
     neo4jPreview.classList.remove("placeholder");
   };
-  reader.onerror = () => {
-    showNeo4jPlaceholder("图片加载失败，请重试。");
+  img.onerror = () => {
+    showNeo4jPlaceholder("未找到 neo4j.png，请将图片放在项目前端目录下。");
   };
-  reader.readAsDataURL(file);
 }
 
 function initNeo4jSection() {
   if (!neo4jPreview) {
     return;
   }
-  showNeo4jPlaceholder();
-  if (neo4jImageInput) {
-    neo4jImageInput.addEventListener("change", (event) => {
-      const input = event.target;
-      const [file] = input.files || [];
-      handleNeo4jImageUpload(file);
-      input.value = "";
-    });
-  }
+  loadNeo4jImage();
 }
 
 function initEventListeners() {

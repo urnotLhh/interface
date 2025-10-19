@@ -708,26 +708,6 @@ button:disabled {
   border: 0;
 }
 
-.upload-label {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px dashed rgba(148, 163, 184, 0.5);
-  border-radius: 0.75rem;
-  padding: 0.75rem;
-  cursor: pointer;
-  transition: border-color 0.2s ease, color 0.2s ease;
-}
-
-.upload-label:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
-#neo4jImage {
-  display: none;
-}
-
 
 .badge.neutral {
   background: rgba(148, 163, 184, 0.7);
