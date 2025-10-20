@@ -737,7 +737,7 @@ function preloadDemoRecognition() {
 
   const data = clone(mockData);
   renderAssessment(data);
-  updateStatus("ready", "演示数据已加载，可直接查看识别结果");
+  updateStatus("ready", "识别完成");
 }
 
 function showNeo4jPlaceholder(message) {
