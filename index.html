@@ -137,16 +137,30 @@
               </p>
             </div>
           </div>
-          <div class="neo4j-config">
-            <div class="neo4j-hint">
-              <strong>使用说明：</strong>
-              <span>
-                将真实 Neo4j 数据库生成的图谱图片命名为 <code>neo4j.png</code> 并放置在前端项目根目录（与 <code>index.html</code> 同级）下，页面将自动展示该图片。
-              </span>
+          <div class="neo4j-content">
+            <div class="neo4j-box">
+              <h3>图谱预览</h3>
+              <div id="neo4jPreview" class="neo4j-preview placeholder">
+                正在查找 Neo4j 图谱图片
+              </div>
             </div>
-          </div>
-          <div id="neo4jPreview" class="neo4j-preview placeholder">
-            正在查找 Neo4j 图谱图片
+            <form
+              id="neo4jSearchForm"
+              class="neo4j-box neo4j-search"
+              autocomplete="off"
+            >
+              <h3>漏洞检索</h3>
+              <label class="visually-hidden" for="neo4jDeviceQuery">
+                设备名称或型号
+              </label>
+              <input
+                type="text"
+                id="neo4jDeviceQuery"
+                name="neo4jDeviceQuery"
+                placeholder="输入设备名称或型号"
+              />
+              <button type="button" class="primary">检索</button>
+            </form>
           </div>
         </section>
 
@@ -190,14 +204,6 @@
                 待输出关联结果
               </div>
             </div>
-            <button
-              type="button"
-              id="useRecognizedDevices"
-              class="ghost"
-              disabled
-            >
-              使用识别结果中的设备类型
-            </button>
           </div>
         </section>
       </main>

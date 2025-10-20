@@ -59,7 +59,7 @@ main {
   grid-template-rows: repeat(2, minmax(0, 1fr));
   grid-template-areas:
     "ip-assessment neo4j"
-    "vuln neo4j";
+    "ip-assessment vuln";
   gap: 0.7rem;
   align-items: stretch;
   flex: 1;
@@ -204,12 +204,14 @@ main {
   font-size: 0.8rem;
 }
 
+
 .assessment-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-  gap: 0.6rem;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: min-content;
+  gap: 0.75rem;
   height: 100%;
-  align-items: stretch;
+  align-content: start;
 }
 
 .assessment-main {
@@ -298,8 +300,50 @@ main {
   min-height: 86px;
 }
 
+.neo4j-panel {
+  gap: 0.45rem;
+}
+
+.neo4j-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 0.7rem;
+  align-items: stretch;
+}
+
+.neo4j-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.65rem;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  background: rgba(241, 245, 249, 0.6);
+  min-height: 0;
+}
+
+.neo4j-box h3 {
+  margin: 0;
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
+  font-weight: 600;
+}
+
 .neo4j-panel .neo4j-preview {
-  min-height: 150px;
+  min-height: 180px;
+  flex: 1;
+}
+
+.neo4j-search {
+  gap: 0.4rem;
+}
+
+.neo4j-search input[type="text"] {
+  min-width: 0;
+  width: 100%;
+}
+
+.neo4j-search .primary {
+  align-self: flex-start;
 }
 
 
@@ -595,6 +639,17 @@ button:disabled {
   }
 }
 
+@media (max-width: 920px) {
+  .neo4j-content {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .neo4j-search .primary {
+    width: 100%;
+  }
+}
+
 @media (max-width: 768px) {
   main,
   .page-header {
@@ -640,31 +695,6 @@ button:disabled {
   .sub-card {
     padding: 1rem;
   }
-}
-
-.neo4j-config {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 0.7rem;
-  align-items: stretch;
-}
-
-.neo4j-hint {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  padding: 0.85rem;
-  border-radius: 0.75rem;
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(59, 130, 246, 0.08));
-  border: 1px solid rgba(56, 189, 248, 0.25);
-  font-size: 0.8rem;
-  line-height: 1.5;
-  color: var(--text-muted);
-}
-
-.neo4j-hint strong {
-  color: var(--text-primary);
-  font-size: 0.85rem;
 }
 
 .neo4j-preview {
@@ -739,6 +769,7 @@ button:disabled {
   font-size: 0.78rem;
 }
 
+
 .device-stats {
   margin-top: 1rem;
   display: flex;
@@ -758,9 +789,16 @@ button:disabled {
 }
 
 .stats-visual {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
   gap: 1.1rem;
+  align-items: start;
+}
+
+.stats-insights {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
   align-items: center;
 }
 
@@ -882,12 +920,13 @@ button:disabled {
   font-style: italic;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 900px) {
   .stats-visual {
-    flex-direction: column;
-    align-items: stretch;
+    grid-template-columns: 1fr;
   }
+}
 
+@media (max-width: 640px) {
   .pie-wrapper {
     margin: 0 auto;
   }
