@@ -306,91 +306,29 @@ function renderAnalysis(analysis) {
 }
 
 function renderRecognition(recognition) {
-  if (!recognition) {
-    deviceRecognition.innerHTML = '<div class="placeholder">未识别到设备信息</div>';
+  const dataset = prepareDeviceStatsDataset(recognition?.stats);
+
+  if (!dataset.entries.length || dataset.total <= 0) {
+    deviceRecognition.innerHTML = '<div class="placeholder">暂无设备识别统计数据</div>';
     deviceRecognition.classList.add("placeholder");
     useRecognizedDevices.disabled = true;
     delete useRecognizedDevices.dataset.types;
     return;
   }
 
-  const recognizedTypes = new Set();
-  if (recognition.primary) {
-    recognizedTypes.add(recognition.primary);
-  }
-  recognition.secondary?.forEach((item) => {
-    if (item?.type) {
-      recognizedTypes.add(item.type);
-    }
-  });
-
-  useRecognizedDevices.dataset.types = JSON.stringify([...recognizedTypes]);
-  useRecognizedDevices.disabled = recognizedTypes.size === 0;
-
   const container = document.createElement("div");
   container.className = "recognition";
+  container.appendChild(createDeviceStatisticsSection(dataset));
 
   deviceRecognition.classList.remove("placeholder");
-
-  const confidence =
-    typeof recognition.confidence === "number"
-      ? `${(recognition.confidence * 100).toFixed(1)}%`
-      : "-";
-
-  const primary = document.createElement("div");
-  primary.innerHTML = `
-    <h4>主设备类型</h4>
-    <p><span class="badge neutral">${confidence}</span> ${recognition.primary}</p>
-  `;
-  container.appendChild(primary);
-
-  if (recognition.metadata) {
-    const metaList = document.createElement("div");
-    metaList.className = "list-grid";
-    Object.entries(recognition.metadata).forEach(([key, value]) => {
-      const item = document.createElement("div");
-      item.className = "list-item";
-      item.innerHTML = `<h4>${translateMetaKey(key)}</h4><p>${value}</p>`;
-      metaList.appendChild(item);
-    });
-    container.appendChild(metaList);
-  }
-
-  if (recognition.secondary?.length) {
-    const secondaryTitle = document.createElement("h4");
-    secondaryTitle.textContent = "候选类型";
-    container.appendChild(secondaryTitle);
-
-    const secondaryList = document.createElement("div");
-    secondaryList.className = "list-grid";
-    recognition.secondary.forEach((item) => {
-      const node = document.createElement("div");
-      node.className = "list-item";
-      const scoreText =
-        typeof item.score === "number" ? `置信度 ${(item.score * 100).toFixed(1)}%` : "置信度未知";
-      node.innerHTML = `
-        <h4>${item.type}</h4>
-        <p>${scoreText}</p>
-      `;
-      secondaryList.appendChild(node);
-    });
-    container.appendChild(secondaryList);
-  }
-
-  if (recognition.stats) {
-    renderDeviceStatistics(container, recognition.stats);
-  }
-
   deviceRecognition.innerHTML = "";
   deviceRecognition.appendChild(container);
+
+  useRecognizedDevices.dataset.types = JSON.stringify(dataset.topEntries.map((entry) => entry.label));
+  useRecognizedDevices.disabled = dataset.topEntries.length === 0;
 }
 
-function renderDeviceStatistics(parent, stats) {
-  const dataset = prepareDeviceStatsDataset(stats);
-  if (!dataset.entries.length || dataset.total <= 0) {
-    return;
-  }
-
+function createDeviceStatisticsSection(dataset) {
   const section = document.createElement("div");
   section.className = "device-stats";
 
@@ -411,7 +349,7 @@ function renderDeviceStatistics(parent, stats) {
 
   section.appendChild(createStatsTable(dataset));
 
-  parent.appendChild(section);
+  return section;
 }
 
 function prepareDeviceStatsDataset(stats) {
@@ -595,17 +533,6 @@ function createStatsTable(dataset) {
   table.appendChild(tbody);
   wrapper.appendChild(table);
   return wrapper;
-}
-
-function translateMetaKey(key) {
-  const mapping = {
-    manufacturer: "厂商",
-    productLine: "产品线",
-    firmware: "固件版本",
-    serial: "序列号",
-    campaign: "目标范围",
-  };
-  return mapping[key] ?? key;
 }
 
 async function performAssessment(mode, useMock) {
