@@ -55,11 +55,9 @@ main {
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(2, minmax(0, 1fr));
-  grid-template-areas:
-    "ip-assessment neo4j"
-    "ip-assessment vuln";
+  grid-template-columns: minmax(0, 1.28fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-areas: "ip-assessment neo4j-vuln";
   gap: 0.7rem;
   align-items: stretch;
   flex: 1;
@@ -71,12 +69,8 @@ main {
   grid-area: ip-assessment;
 }
 
-.neo4j-panel {
-  grid-area: neo4j;
-}
-
-.vuln-panel {
-  grid-area: vuln;
+.neo4j-vuln-panel {
+  grid-area: neo4j-vuln;
 }
 
 .page-header {
@@ -300,50 +294,64 @@ main {
   min-height: 86px;
 }
 
-.neo4j-panel {
-  gap: 0.45rem;
+.neo4j-vuln-panel {
+  gap: 0.55rem;
 }
 
-.neo4j-content {
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-  gap: 0.7rem;
-  align-items: stretch;
-}
-
-.neo4j-box {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  padding: 0.65rem;
-  border-radius: 0.8rem;
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  background: rgba(241, 245, 249, 0.6);
-  min-height: 0;
-}
-
-.neo4j-box h3 {
+.neo4j-vuln-panel h3 {
   margin: 0;
   font-size: clamp(0.85rem, 1.1vw, 1rem);
   font-weight: 600;
 }
 
-.neo4j-panel .neo4j-preview {
-  min-height: 180px;
-  flex: 1;
+.neo4j-vuln-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
 }
 
-.neo4j-search {
+.neo4j-visual-block {
+  display: flex;
+  flex-direction: column;
   gap: 0.4rem;
 }
 
-.neo4j-search input[type="text"] {
-  min-width: 0;
+.neo4j-eval-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.65rem;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  background: rgba(241, 245, 249, 0.6);
+}
+
+.neo4j-inline-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.neo4j-input-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.neo4j-inline-form input[type="text"] {
+  flex: 0 1 210px;
+  max-width: 240px;
+  min-width: 160px;
   width: 100%;
 }
 
-.neo4j-search .primary {
-  align-self: flex-start;
+.neo4j-input-row .primary {
+  flex-shrink: 0;
+}
+
+.neo4j-input-row .ghost {
+  flex-shrink: 0;
 }
 
 
@@ -640,12 +648,17 @@ button:disabled {
 }
 
 @media (max-width: 920px) {
-  .neo4j-content {
-    grid-template-columns: 1fr;
-    gap: 0.6rem;
+  .neo4j-input-row {
+    justify-content: flex-start;
   }
 
-  .neo4j-search .primary {
+  .neo4j-inline-form input[type="text"] {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .neo4j-input-row .primary,
+  .neo4j-input-row .ghost {
     width: 100%;
   }
 }
@@ -660,8 +673,7 @@ button:disabled {
     grid-template-columns: 1fr;
     grid-template-areas:
       "ip-assessment"
-      "neo4j"
-      "vuln";
+      "neo4j-vuln";
     gap: 1.25rem;
   }
 
