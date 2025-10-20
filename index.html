@@ -128,76 +128,68 @@
           </div>
         </section>
 
-        <section class="card neo4j-panel" aria-labelledby="neo4j-title">
+        <section class="card neo4j-vuln-panel" aria-labelledby="neo4j-title">
           <div class="card-header">
             <div>
-              <h2 id="neo4j-title">Neo4j漏洞库</h2>
+              <h2 id="neo4j-title">Neo4j漏洞库与评估结果</h2>
               <p class="description">
-                上传来自 Neo4j 的图谱截图或导出图片，展示实际的资产与漏洞关系。
+                上部展示 Neo4j 图谱截图，下部集中检索并查看漏洞评估结果。
               </p>
             </div>
           </div>
-          <div class="neo4j-config">
-            <div class="neo4j-hint">
-              <strong>使用说明：</strong>
-              <span>
-                将真实 Neo4j 数据库生成的图谱图片命名为 <code>neo4j.png</code> 并放置在前端项目根目录（与 <code>index.html</code> 同级）下，页面将自动展示该图片。
-              </span>
-            </div>
-          </div>
-          <div id="neo4jPreview" class="neo4j-preview placeholder">
-            正在查找 Neo4j 图谱图片
-          </div>
-        </section>
-
-        <section class="card vuln-panel" aria-labelledby="vuln-search-title">
-          <div class="card-header">
-            <div>
-              <h2 id="vuln-search-title">漏洞评估结果</h2>
-              <p class="description">
-                根据识别到的设备类型检索 CVE 漏洞，并输出关联的 CPE 映射分析。
-              </p>
-            </div>
-            <button
-              type="button"
-              id="useRecognizedDevices"
-              class="ghost"
-              disabled
-            >
-              使用识别结果中的设备类型
-            </button>
-          </div>
-          <form id="vulnForm" class="stack-form" autocomplete="off">
-            <label for="deviceTypes">设备类型列表</label>
-            <textarea
-              id="deviceTypes"
-              name="deviceTypes"
-              rows="3"
-              placeholder="例如：Industrial Router, PLC Controller"
-            ></textarea>
-            <div class="form-actions">
-              <button type="submit" class="primary">检索漏洞</button>
-              <span id="vulnTime" class="muted"></span>
-            </div>
-          </form>
-          <div class="vuln-results-grid">
-            <div id="vulnerabilityResults" class="table-wrapper placeholder">
-              尚未发起漏洞检索
-            </div>
-            <div class="sub-card">
-              <h3 id="analysis-title">CPE 映射分析</h3>
-              <div id="analysisResults" class="placeholder">
-                待输出关联结果
+          <div class="neo4j-vuln-body">
+            <div class="neo4j-visual-block sub-card">
+              <h3>图谱预览</h3>
+              <div id="neo4jPreview" class="neo4j-preview placeholder">
+                正在查找 Neo4j 图谱图片
               </div>
             </div>
-            <button
-              type="button"
-              id="useRecognizedDevices"
-              class="ghost"
-              disabled
-            >
-              使用识别结果中的设备类型
-            </button>
+            <div class="neo4j-eval-block">
+              <form id="vulnForm" class="neo4j-inline-form" autocomplete="off">
+                <label class="visually-hidden" for="deviceTypes">
+                  设备名称或型号
+                </label>
+                <div class="neo4j-input-row">
+                  <input
+                    type="text"
+                    id="deviceTypes"
+                    name="deviceTypes"
+                    placeholder="输入设备名称或型号"
+                  />
+                  <button type="submit" class="primary">检索</button>
+                  <button type="button" id="useRecognizedDevices" class="ghost">
+                    扫描结果评估
+                  </button>
+                </div>
+                <span id="vulnTime" class="muted"></span>
+              </form>
+              <div class="scan-eval-section sub-card">
+                <div class="scan-eval-header">
+                  <h3>扫描结果评估</h3>
+                  <button type="button" class="secondary" id="downloadReport">
+                    下载漏洞评估报告
+                  </button>
+                </div>
+                <div class="scan-eval-stats">
+                  <div class="scan-eval-stat critical">
+                    <span class="label">CRITICAL（严重）</span>
+                    <span class="value">0</span>
+                  </div>
+                  <div class="scan-eval-stat high">
+                    <span class="label">HIGH（高）</span>
+                    <span class="value">5</span>
+                  </div>
+                  <div class="scan-eval-stat medium">
+                    <span class="label">MEDIUM（中等）</span>
+                    <span class="value">5</span>
+                  </div>
+                  <div class="scan-eval-stat low">
+                    <span class="label">LOW（低）</span>
+                    <span class="value">10</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </main>
