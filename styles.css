@@ -300,8 +300,50 @@ main {
   min-height: 86px;
 }
 
+.neo4j-panel {
+  gap: 0.45rem;
+}
+
+.neo4j-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 0.7rem;
+  align-items: stretch;
+}
+
+.neo4j-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.65rem;
+  border-radius: 0.8rem;
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  background: rgba(241, 245, 249, 0.6);
+  min-height: 0;
+}
+
+.neo4j-box h3 {
+  margin: 0;
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
+  font-weight: 600;
+}
+
 .neo4j-panel .neo4j-preview {
-  min-height: 150px;
+  min-height: 180px;
+  flex: 1;
+}
+
+.neo4j-search {
+  gap: 0.4rem;
+}
+
+.neo4j-search input[type="text"] {
+  min-width: 0;
+  width: 100%;
+}
+
+.neo4j-search .primary {
+  align-self: flex-start;
 }
 
 
@@ -594,6 +636,17 @@ button:disabled {
 
   .vuln-results-grid {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 920px) {
+  .neo4j-content {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .neo4j-search .primary {
+    width: 100%;
   }
 }
 
