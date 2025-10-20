@@ -623,44 +623,6 @@ button:disabled {
   font-size: 0.9rem;
 }
 
-.table-wrapper {
-  overflow-x: auto;
-  border-radius: 0.85rem;
-  border: 1px solid rgba(226, 232, 240, 0.9);
-  background: #fff;
-}
-
-.vuln-results-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  gap: 0.65rem;
-  align-items: stretch;
-  grid-auto-rows: minmax(0, 1fr);
-}
-
-.table-wrapper table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.78rem;
-}
-
-.table-wrapper thead {
-  background: rgba(226, 232, 240, 0.7);
-}
-
-.table-wrapper th,
-.table-wrapper td {
-  padding: 0.55rem 0.75rem;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
-  text-align: left;
-}
-
-.table-wrapper th {
-  color: var(--text);
-  font-weight: 600;
-  font-size: 0.78rem;
-}
-
 .badge {
   display: inline-block;
   padding: 0.18rem 0.5rem;
@@ -717,8 +679,32 @@ button:disabled {
     gap: 0.6rem;
   }
 
-  .vuln-results-grid {
-    grid-template-columns: minmax(0, 1fr);
+}
+
+@media (max-width: 920px) {
+  .neo4j-input-row {
+    justify-content: flex-start;
+  }
+
+  .neo4j-inline-form input[type="text"] {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .neo4j-input-row .primary,
+  .neo4j-input-row .ghost {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .scan-eval-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .scan-eval-header .secondary {
+    width: 100%;
   }
 }
 
