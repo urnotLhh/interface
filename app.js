@@ -459,10 +459,6 @@ function createLegendElement(dataset) {
     label.textContent = entry.label;
     meta.appendChild(label);
 
-    const detail = document.createElement("span");
-    detail.textContent = `${formatNumber(entry.count)} 台 · ${formatPercentage(entry.percentage)}`;
-    meta.appendChild(detail);
-
     item.appendChild(meta);
     legend.appendChild(item);
   });
