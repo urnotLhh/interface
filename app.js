@@ -221,6 +221,9 @@ function updateStatus(state, message) {
 }
 
 function renderVulnerabilities(vulnerabilities) {
+  if (!vulnerabilityResults) {
+    return;
+  }
   if (!vulnerabilities || vulnerabilities.length === 0) {
     vulnerabilityResults.innerHTML = '<div class="alert">未检索到相关漏洞。</div>';
     vulnerabilityResults.classList.remove("placeholder");
@@ -271,6 +274,9 @@ function renderVulnerabilities(vulnerabilities) {
 }
 
 function renderAnalysis(analysis) {
+  if (!analysisResults) {
+    return;
+  }
   if (!analysis || analysis.length === 0) {
     analysisResults.innerHTML = '<div class="placeholder">暂无映射数据</div>';
     analysisResults.classList.add("placeholder");
@@ -641,8 +647,10 @@ async function handleVulnerabilitySearch(deviceTypes, useMock) {
     .filter(Boolean);
 
   if (devices.length === 0) {
-    vulnerabilityResults.innerHTML = '<div class="alert">请至少输入一个设备类型。</div>';
-    vulnerabilityResults.classList.remove("placeholder");
+    if (vulnerabilityResults) {
+      vulnerabilityResults.innerHTML = '<div class="alert">请至少输入一个设备类型。</div>';
+      vulnerabilityResults.classList.remove("placeholder");
+    }
     return;
   }
 
@@ -670,8 +678,10 @@ async function handleVulnerabilitySearch(deviceTypes, useMock) {
     vulnTime.textContent = `耗时 ${(performance.now() - start).toFixed(0)} ms`;
   } catch (error) {
     console.error(error);
-    vulnerabilityResults.innerHTML = `<div class="alert">${error.message}</div>`;
-    vulnerabilityResults.classList.remove("placeholder");
+    if (vulnerabilityResults) {
+      vulnerabilityResults.innerHTML = `<div class="alert">${error.message}</div>`;
+      vulnerabilityResults.classList.remove("placeholder");
+    }
     vulnTime.textContent = "";
   }
 }
@@ -704,11 +714,15 @@ function resetDashboard() {
   useRecognizedDevices.disabled = true;
   delete useRecognizedDevices.dataset.types;
 
-  vulnerabilityResults.innerHTML = "尚未发起漏洞检索";
-  vulnerabilityResults.classList.add("placeholder");
+  if (vulnerabilityResults) {
+    vulnerabilityResults.innerHTML = "尚未发起漏洞检索";
+    vulnerabilityResults.classList.add("placeholder");
+  }
 
-  analysisResults.innerHTML = "待输出关联结果";
-  analysisResults.classList.add("placeholder");
+  if (analysisResults) {
+    analysisResults.innerHTML = "待输出关联结果";
+    analysisResults.classList.add("placeholder");
+  }
 
   vulnTime.textContent = "";
   document.getElementById("deviceTypes").value = "";
