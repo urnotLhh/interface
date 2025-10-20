@@ -343,11 +343,15 @@ function createDeviceStatisticsSection(dataset) {
 
   const visual = document.createElement("div");
   visual.className = "stats-visual";
-  visual.appendChild(createPieChartElement(dataset));
-  visual.appendChild(createLegendElement(dataset));
-  section.appendChild(visual);
 
-  section.appendChild(createStatsTable(dataset));
+  const insights = document.createElement("div");
+  insights.className = "stats-insights";
+  insights.appendChild(createPieChartElement(dataset));
+  insights.appendChild(createLegendElement(dataset));
+  visual.appendChild(insights);
+
+  visual.appendChild(createStatsTable(dataset));
+  section.appendChild(visual);
 
   return section;
 }
