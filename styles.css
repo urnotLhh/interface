@@ -59,7 +59,7 @@ main {
   grid-template-rows: repeat(2, minmax(0, 1fr));
   grid-template-areas:
     "ip-assessment neo4j"
-    "vuln neo4j";
+    "ip-assessment vuln";
   gap: 0.7rem;
   align-items: stretch;
   flex: 1;
@@ -642,31 +642,6 @@ button:disabled {
   .sub-card {
     padding: 1rem;
   }
-}
-
-.neo4j-config {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 0.7rem;
-  align-items: stretch;
-}
-
-.neo4j-hint {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  padding: 0.85rem;
-  border-radius: 0.75rem;
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(59, 130, 246, 0.08));
-  border: 1px solid rgba(56, 189, 248, 0.25);
-  font-size: 0.8rem;
-  line-height: 1.5;
-  color: var(--text-muted);
-}
-
-.neo4j-hint strong {
-  color: var(--text-primary);
-  font-size: 0.85rem;
 }
 
 .neo4j-preview {
