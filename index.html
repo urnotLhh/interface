@@ -157,17 +157,38 @@
                     placeholder="输入设备名称或型号"
                   />
                   <button type="submit" class="primary">检索</button>
-                  <button
-                    type="button"
-                    id="useRecognizedDevices"
-                    class="ghost"
-                    disabled
-                  >
+                  <button type="button" id="useRecognizedDevices" class="ghost">
                     扫描结果评估
                   </button>
                 </div>
                 <span id="vulnTime" class="muted"></span>
               </form>
+              <div class="scan-eval-section sub-card">
+                <div class="scan-eval-header">
+                  <h3>扫描结果评估</h3>
+                  <button type="button" class="secondary" id="downloadReport">
+                    下载漏洞评估报告
+                  </button>
+                </div>
+                <div class="scan-eval-stats">
+                  <div class="scan-eval-stat critical">
+                    <span class="label">CRITICAL（严重）</span>
+                    <span class="value">0</span>
+                  </div>
+                  <div class="scan-eval-stat high">
+                    <span class="label">HIGH（高）</span>
+                    <span class="value">5</span>
+                  </div>
+                  <div class="scan-eval-stat medium">
+                    <span class="label">MEDIUM（中等）</span>
+                    <span class="value">5</span>
+                  </div>
+                  <div class="scan-eval-stat low">
+                    <span class="label">LOW（低）</span>
+                    <span class="value">10</span>
+                  </div>
+                </div>
+              </div>
               <div class="vuln-results-grid">
                 <div id="vulnerabilityResults" class="table-wrapper placeholder">
                   尚未发起漏洞检索
