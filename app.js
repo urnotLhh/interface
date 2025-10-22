@@ -20,22 +20,22 @@ const mockData = {
   ip: "192.168.1.10",
   fingerprint: {
     technologies: [
-      { name: "OpenSSH", version: "8.4p1", category: "远程管理" },
-      { name: "nginx", version: "1.22", category: "Web 服务" },
-      { name: "Siemens S7", version: "V5.6", category: "工业控制" },
+      { name: "OpenSSH", version: "8.4p1", category: "Remote Management" },
+      { name: "nginx", version: "1.22", category: "Web Services" },
+      { name: "Siemens S7", version: "V5.6", category: "Industrial Control" },
     ],
     os: "Embedded Linux (kernel 4.19)",
   },
   recognition: {
-    primary: "工业网关 / 路由器",
+    primary: "Industrial Gateway / Router",
     confidence: 0.87,
     secondary: [
-      { type: "工业控制器", score: 0.65 },
-      { type: "边缘计算节点", score: 0.42 },
+      { type: "Industrial Controller", score: 0.65 },
+      { type: "Edge Computing Node", score: 0.42 },
     ],
     metadata: {
       manufacturer: "Siemens",
-      productLine: "Scalance M 系列",
+      productLine: "Scalance M Series",
       firmware: "V8.2.1",
       serial: "SCM-38210",
     },
@@ -60,7 +60,7 @@ const mockData = {
       cve: "CVE-2023-12345",
       severity: "high",
       score: 8.8,
-      description: "某些 Scalance 设备中的身份验证绕过漏洞，可导致未授权访问。",
+      description: "An authentication bypass vulnerability in certain Scalance devices could allow unauthorized access.",
       published: "2023-11-18",
       exploit: "PoC",
     },
@@ -68,34 +68,34 @@ const mockData = {
       cve: "CVE-2022-55678",
       severity: "medium",
       score: 6.5,
-      description: "nginx HTTP/2 模块在特定条件下可能导致拒绝服务。",
+      description: "The nginx HTTP/2 module can trigger a denial of service under specific conditions.",
       published: "2022-08-01",
-      exploit: "暂无",
+      exploit: "Not available",
     },
     {
       cve: "CVE-2021-9876",
       severity: "low",
       score: 4.3,
-      description: "OpenSSH 在弱配置下可能允许信息泄露，需要特定环境。",
+      description: "OpenSSH may allow information disclosure under weak configurations in specific environments.",
       published: "2021-04-12",
-      exploit: "暂无",
+      exploit: "Not available",
     },
   ],
   analysis: [
     {
-      deviceType: "工业网关 / 路由器",
+      deviceType: "Industrial Gateway / Router",
       cpe: "cpe:/o:siemens:scalance_m745",
-      relationship: "资产类型",
+      relationship: "Asset type",
     },
     {
-      deviceType: "工业控制器",
+      deviceType: "Industrial Controller",
       cpe: "cpe:/a:siemens:wincc:8.1",
-      relationship: "配套软件",
+      relationship: "Companion software",
     },
     {
-      deviceType: "边缘计算节点",
+      deviceType: "Edge Computing Node",
       cpe: "cpe:/h:siemens:industrial_edge",
-      relationship: "备选方案",
+      relationship: "Alternative",
     },
   ],
 };
@@ -144,7 +144,7 @@ function formatNumber(value) {
   if (typeof value !== "number" || Number.isNaN(value)) {
     return "-";
   }
-  return value.toLocaleString("zh-CN");
+  return value.toLocaleString("en-US");
 }
 
 function formatPercentage(value) {
@@ -185,10 +185,10 @@ function buildSummaryFromInputs(mode) {
     const file = targetFileInput?.files?.[0];
     return {
       mode,
-      label: file ? `文件：${file.name}` : "文件上传",
+      label: file ? `File: ${file.name}` : "File upload",
       targetsPreview: file ? [file.name] : [],
       totalTargets: file ? undefined : 0,
-      message: file ? `已导入文件 ${file.name}` : undefined,
+      message: file ? `Imported file ${file.name}` : undefined,
     };
   }
 
@@ -197,20 +197,20 @@ function buildSummaryFromInputs(mode) {
     const mask = targetMaskInput?.value?.trim();
     return {
       mode,
-      label: subnet && mask ? `${subnet} / ${mask}` : "子网段",
+      label: subnet && mask ? `${subnet} / ${mask}` : "Subnet range",
       targetsPreview: subnet && mask ? [`${subnet}/${mask}`] : [],
       totalTargets: undefined,
-      message: subnet && mask ? `子网 ${subnet}/${mask} 将用于扫描` : undefined,
+      message: subnet && mask ? `Subnet ${subnet}/${mask} will be scanned` : undefined,
     };
   }
 
   const ip = targetIpInput?.value?.trim();
   return {
     mode: "single",
-    label: ip || "目标 IP",
+    label: ip || "Target IP",
     targetsPreview: ip ? [ip] : [],
     totalTargets: ip ? 1 : 0,
-    message: ip ? `目标 IP ${ip} 正在评估` : undefined,
+    message: ip ? `Target IP ${ip} is under assessment` : undefined,
   };
 }
 
@@ -225,7 +225,7 @@ function renderVulnerabilities(vulnerabilities) {
     return;
   }
   if (!vulnerabilities || vulnerabilities.length === 0) {
-    vulnerabilityResults.innerHTML = '<div class="alert">未检索到相关漏洞。</div>';
+    vulnerabilityResults.innerHTML = '<div class="alert">No related vulnerabilities were found.</div>';
     vulnerabilityResults.classList.remove("placeholder");
     return;
   }
@@ -235,11 +235,11 @@ function renderVulnerabilities(vulnerabilities) {
   thead.innerHTML = `
     <tr>
       <th>CVE</th>
-      <th>严重程度</th>
+      <th>Severity</th>
       <th>CVSS</th>
-      <th>描述</th>
-      <th>发布时间</th>
-      <th>利用情况</th>
+      <th>Description</th>
+      <th>Published</th>
+      <th>Exploit</th>
     </tr>
   `;
   table.appendChild(thead);
@@ -278,7 +278,7 @@ function renderAnalysis(analysis) {
     return;
   }
   if (!analysis || analysis.length === 0) {
-    analysisResults.innerHTML = '<div class="placeholder">暂无映射数据</div>';
+    analysisResults.innerHTML = '<div class="placeholder">No mapping data available</div>';
     analysisResults.classList.add("placeholder");
     return;
   }
@@ -287,9 +287,9 @@ function renderAnalysis(analysis) {
   table.innerHTML = `
     <thead>
       <tr>
-        <th>设备类型</th>
+        <th>Device Type</th>
         <th>CPE</th>
-        <th>关系描述</th>
+        <th>Relationship</th>
       </tr>
     </thead>
   `;
@@ -300,7 +300,7 @@ function renderAnalysis(analysis) {
     tr.innerHTML = `
       <td>${item.deviceType}</td>
       <td><code>${item.cpe}</code></td>
-      <td>${item.relationship ?? "关联"}</td>
+      <td>${item.relationship ?? "Association"}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -315,7 +315,7 @@ function renderRecognition(recognition) {
   const dataset = prepareDeviceStatsDataset(recognition?.stats);
 
   if (!dataset.entries.length || dataset.total <= 0) {
-    deviceRecognition.innerHTML = '<div class="placeholder">暂无设备识别统计数据</div>';
+    deviceRecognition.innerHTML = '<div class="placeholder">No device recognition statistics are available yet</div>';
     deviceRecognition.classList.add("placeholder");
     useRecognizedDevices.disabled = true;
     delete useRecognizedDevices.dataset.types;
@@ -339,12 +339,12 @@ function createDeviceStatisticsSection(dataset) {
   section.className = "device-stats";
 
   const title = document.createElement("h4");
-  title.textContent = "设备识别统计";
+  title.textContent = "Device recognition statistics";
   section.appendChild(title);
 
   const summary = document.createElement("p");
   summary.className = "stats-summary";
-  summary.textContent = `共扫描 ${formatNumber(dataset.total)} 个设备，以下为数量排名前十的设备类型：`;
+  summary.textContent = `Scanned ${formatNumber(dataset.total)} devices in total. The top ten device categories are listed below:`;
   section.appendChild(summary);
 
   const visual = document.createElement("div");
@@ -382,7 +382,7 @@ function prepareDeviceStatsDataset(stats) {
           : total > 0
           ? (count / total) * 100
           : 0;
-      const label = item.label ?? item.name ?? item.type ?? "未知设备";
+      const label = item.label ?? item.name ?? item.type ?? "Unknown device";
       return { label, count, percentage, isOther: false };
     })
     .filter(Boolean);
@@ -392,7 +392,7 @@ function prepareDeviceStatsDataset(stats) {
 
   if (remainder > 0) {
     entries.push({
-      label: "其他",
+      label: "Other",
       count: remainder,
       percentage: total > 0 ? (remainder / total) * 100 : 0,
       isOther: true,
@@ -435,7 +435,7 @@ function createPieChartElement(dataset) {
 
   const center = document.createElement("div");
   center.className = "pie-center";
-  center.innerHTML = `<strong>${formatNumber(dataset.total)}</strong><span>设备总数</span>`;
+  center.innerHTML = `<strong>${formatNumber(dataset.total)}</strong><span>Devices in total</span>`;
   pie.appendChild(center);
 
   wrapper.appendChild(pie);
@@ -482,10 +482,10 @@ function createStatsTable(dataset) {
   table.innerHTML = `
     <thead>
       <tr>
-        <th>排名</th>
-        <th>设备类型</th>
-        <th>数量</th>
-        <th>占比</th>
+        <th>Rank</th>
+        <th>Device Type</th>
+        <th>Count</th>
+        <th>Share</th>
       </tr>
     </thead>
   `;
@@ -503,7 +503,7 @@ function createStatsTable(dataset) {
     tr.appendChild(label);
 
     const count = document.createElement("td");
-    count.textContent = `${formatNumber(entry.count)} 台`;
+    count.textContent = `${formatNumber(entry.count)}`;
     tr.appendChild(count);
 
     const percentage = document.createElement("td");
@@ -526,7 +526,7 @@ function createStatsTable(dataset) {
     tr.appendChild(label);
 
     const count = document.createElement("td");
-    count.textContent = `${formatNumber(dataset.otherEntry.count)} 台`;
+    count.textContent = `${formatNumber(dataset.otherEntry.count)}`;
     tr.appendChild(count);
 
     const percentage = document.createElement("td");
@@ -543,7 +543,7 @@ function createStatsTable(dataset) {
 
 async function performAssessment(mode, useMock) {
   setLoadingState(true);
-  updateStatus("loading", "正在发起评估任务...");
+  updateStatus("loading", "Starting assessment task...");
 
   const summary = buildSummaryFromInputs(mode);
 
@@ -555,8 +555,8 @@ async function performAssessment(mode, useMock) {
       data.summary = {
         ...summary,
         message: summary.message
-          ? `${summary.message}（演示数据）`
-          : "演示数据结果",
+          ? `${summary.message} (demo data)`
+          : "Demo data result",
       };
 
     }
@@ -565,8 +565,8 @@ async function performAssessment(mode, useMock) {
     updateStatus(
       "ready",
       summary?.label
-        ? `评估完成（演示）：${summary.label}`
-        : "评估完成（演示数据）"
+        ? `Assessment complete (demo): ${summary.label}`
+        : "Assessment complete (demo data)"
     );
     setLoadingState(false);
     return;
@@ -580,10 +580,10 @@ async function performAssessment(mode, useMock) {
 
     const data = await response.json();
     renderAssessment(data);
-    updateStatus("ready", data.summary?.message ?? "评估完成");
+    updateStatus("ready", data.summary?.message ?? "Assessment complete");
   } catch (error) {
     console.error(error);
-    updateStatus("error", error.message || "评估失败，请检查后端服务");
+    updateStatus("error", error.message || "Assessment failed. Please verify the backend service.");
   } finally {
     setLoadingState(false);
   }
@@ -592,7 +592,7 @@ async function performAssessment(mode, useMock) {
 function sendAssessmentRequest(mode) {
   if (mode === "file") {
     if (!targetFileInput?.files?.length) {
-      throw new Error("请先选择包含 IP 的文件");
+      throw new Error("Please select a file that contains IP addresses first.");
     }
     const formData = new FormData();
     formData.append("type", "file");
@@ -630,9 +630,9 @@ function sendAssessmentRequest(mode) {
 async function extractError(response) {
   try {
     const data = await response.json();
-    return data?.message ?? response.statusText ?? "未知错误";
+    return data?.message ?? response.statusText ?? "Unknown error";
   } catch (error) {
-    return response.statusText || "服务异常";
+    return response.statusText || "Service error";
   }
 }
 
@@ -648,20 +648,20 @@ async function handleVulnerabilitySearch(deviceTypes, useMock) {
 
   if (devices.length === 0) {
     if (vulnerabilityResults) {
-      vulnerabilityResults.innerHTML = '<div class="alert">请至少输入一个设备类型。</div>';
+      vulnerabilityResults.innerHTML = '<div class="alert">Please enter at least one device type.</div>';
       vulnerabilityResults.classList.remove("placeholder");
     }
     return;
   }
 
   const start = performance.now();
-  vulnTime.textContent = "检索中...";
+  vulnTime.textContent = "Searching...";
 
   if (useMock) {
     await delay(420);
     renderVulnerabilities(mockData.vulnerabilities);
     renderAnalysis(mockData.analysis);
-    vulnTime.textContent = `耗时 ${(performance.now() - start).toFixed(0)} ms（演示数据）`;
+    vulnTime.textContent = `Elapsed ${(performance.now() - start).toFixed(0)} ms (demo data)`;
     return;
   }
 
@@ -671,11 +671,11 @@ async function handleVulnerabilitySearch(deviceTypes, useMock) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ deviceTypes: devices }),
     });
-    if (!response.ok) throw new Error("漏洞检索失败");
+    if (!response.ok) throw new Error("Vulnerability search failed");
     const data = await response.json();
     renderVulnerabilities(data.vulnerabilities);
     renderAnalysis(data.analysis);
-    vulnTime.textContent = `耗时 ${(performance.now() - start).toFixed(0)} ms`;
+    vulnTime.textContent = `Elapsed ${(performance.now() - start).toFixed(0)} ms`;
   } catch (error) {
     console.error(error);
     if (vulnerabilityResults) {
@@ -709,24 +709,24 @@ function resetDashboard() {
   }
   setAssessmentMode("single");
 
-  deviceRecognition.innerHTML = "等待识别结果";
+  deviceRecognition.innerHTML = "Waiting for recognition results";
   deviceRecognition.classList.add("placeholder");
   useRecognizedDevices.disabled = true;
   delete useRecognizedDevices.dataset.types;
 
   if (vulnerabilityResults) {
-    vulnerabilityResults.innerHTML = "尚未发起漏洞检索";
+    vulnerabilityResults.innerHTML = "Vulnerability search has not started yet";
     vulnerabilityResults.classList.add("placeholder");
   }
 
   if (analysisResults) {
-    analysisResults.innerHTML = "待输出关联结果";
+    analysisResults.innerHTML = "Awaiting correlation results";
     analysisResults.classList.add("placeholder");
   }
 
   vulnTime.textContent = "";
   document.getElementById("deviceTypes").value = "";
-  const initialStatus = USE_MOCK_DATA ? "等待操作（演示模式）" : "等待操作";
+  const initialStatus = USE_MOCK_DATA ? "Awaiting action (demo mode)" : "Awaiting action";
   updateStatus("ready", initialStatus);
 }
 
@@ -737,7 +737,7 @@ function preloadDemoRecognition() {
 
   const data = clone(mockData);
   renderAssessment(data);
-  updateStatus("ready", "识别完成");
+  updateStatus("ready", "Recognition complete");
 }
 
 function showNeo4jPlaceholder(message) {
@@ -746,7 +746,7 @@ function showNeo4jPlaceholder(message) {
   }
   const placeholder = document.createElement("div");
   placeholder.className = "placeholder";
-  placeholder.textContent = message || "正在查找 Neo4j 图谱图片";
+  placeholder.textContent = message || "Searching for Neo4j graph image";
   neo4jPreview.innerHTML = "";
   neo4jPreview.appendChild(placeholder);
   neo4jPreview.classList.add("placeholder");
@@ -758,14 +758,14 @@ function loadNeo4jImage() {
   }
   const img = document.createElement("img");
   img.src = "neo4j.png";
-  img.alt = "Neo4j 图谱预览";
+  img.alt = "Neo4j graph preview";
   img.onload = () => {
     neo4jPreview.innerHTML = "";
     neo4jPreview.appendChild(img);
     neo4jPreview.classList.remove("placeholder");
   };
   img.onerror = () => {
-    showNeo4jPlaceholder("未找到 neo4j.png，请将图片放在项目前端目录下。");
+    showNeo4jPlaceholder("neo4j.png was not found. Place the image in the project front-end directory.");
   };
 }
 

@@ -27,7 +27,7 @@ app.post("/api/assessment", upload.single("targetsFile"), (req, res, next) => {
 app.post("/api/vulnerabilities", (req, res) => {
   const deviceTypes = Array.isArray(req.body?.deviceTypes) ? req.body.deviceTypes : [];
   if (deviceTypes.length === 0) {
-    return res.status(400).json({ message: "deviceTypes 不能为空" });
+    return res.status(400).json({ message: "deviceTypes cannot be empty" });
   }
 
   const normalized = deviceTypes.map((item) => item.toLowerCase());
@@ -53,11 +53,11 @@ app.get("/api/health", (_req, res) => {
 app.use((error, _req, res, _next) => {
   console.error(error);
   const status = error.status ?? 500;
-  res.status(status).json({ message: error.message ?? "服务器内部错误" });
+  res.status(status).json({ message: error.message ?? "Internal server error" });
 });
 
 app.listen(PORT, () => {
-  console.log(`漏洞评估前端示例服务已启动：http://localhost:${PORT}`);
+  console.log(`Vulnerability assessment front-end demo service started: http://localhost:${PORT}`);
 });
 
 function createSummaryFromRequest(req) {
@@ -65,18 +65,18 @@ function createSummaryFromRequest(req) {
 
   if (type === "file") {
     if (!req.file) {
-      throw createHttpError(400, "请上传包含 IP 的文件");
+      throw createHttpError(400, "Please upload a file containing IP addresses");
     }
     const targets = parseTargetsFromFile(req.file.buffer);
     if (targets.length === 0) {
-      throw createHttpError(400, "文件中未检测到有效目标");
+      throw createHttpError(400, "No valid targets were detected in the file");
     }
     return {
       mode: "file",
-      label: `${req.file.originalname}（${targets.length} 条记录）`,
+      label: `${req.file.originalname} (${targets.length} entries)`,
       targetsPreview: targets.slice(0, 5),
       totalTargets: targets.length,
-      message: `已导入 ${targets.length} 个目标，开始评估`,
+      message: `Imported ${targets.length} targets. Starting assessment.`,
     };
   }
 
@@ -84,12 +84,12 @@ function createSummaryFromRequest(req) {
     const subnet = (req.body?.subnet ?? "").trim();
     const mask = (req.body?.mask ?? "").trim();
     if (!subnet || !mask) {
-      throw createHttpError(400, "请提供子网和掩码/前缀");
+      throw createHttpError(400, "Please provide a subnet and mask/prefix");
     }
 
     const preview = generateSampleIps(subnet);
     if (!preview.length) {
-      throw createHttpError(400, "子网格式不正确");
+      throw createHttpError(400, "The subnet format is invalid");
     }
 
     const prefix = maskToPrefix(mask);
@@ -100,13 +100,13 @@ function createSummaryFromRequest(req) {
       label: `${subnet}/${mask}`,
       targetsPreview: preview,
       totalTargets,
-      message: `子网 ${subnet}/${mask} 预计扫描 ${totalTargets} 个目标`,
+      message: `Subnet ${subnet}/${mask} is expected to scan ${totalTargets} targets`,
     };
   }
 
   const ip = (req.body?.ip ?? "").trim();
   if (!ip) {
-    throw createHttpError(400, "请提供有效的 IP 地址");
+    throw createHttpError(400, "Please provide a valid IP address");
   }
 
   return {
@@ -114,7 +114,7 @@ function createSummaryFromRequest(req) {
     label: ip,
     targetsPreview: [ip],
     totalTargets: 1,
-    message: `已完成对 ${ip} 的单点评估`,
+    message: `Completed single-host assessment for ${ip}`,
   };
 }
 
@@ -133,15 +133,15 @@ function buildAssessmentResponse(summary) {
 
   const statistics = [
     {
-      label: "评估目标数",
+      label: "Targets assessed",
       value: summary.totalTargets ?? summary.targetsPreview?.length ?? 1,
     },
     {
-      label: "目标样本",
+      label: "Sample targets",
       value: summary.targetsPreview?.slice(0, 3).join(", ") ?? "-",
     },
     ...SAMPLE_STATISTICS.slice(0, 3).map((item) => ({ ...item })),
-    { label: "最近扫描", value: timestamp },
+    { label: "Latest scan", value: timestamp },
   ];
 
   const fingerprint = {
@@ -247,37 +247,37 @@ function createHttpError(status, message) {
 }
 
 const SAMPLE_SCAN_OVERVIEW = [
-  { title: "端口 22", status: "开放", service: "OpenSSH 8.4" },
-  { title: "端口 80", status: "开放", service: "nginx 1.22" },
-  { title: "端口 502", status: "开放", service: "Modbus/TCP" },
-  { title: "端口 102", status: "开放", service: "Siemens S7" },
+  { title: "Port 22", status: "Open", service: "OpenSSH 8.4" },
+  { title: "Port 80", status: "Open", service: "nginx 1.22" },
+  { title: "Port 502", status: "Open", service: "Modbus/TCP" },
+  { title: "Port 102", status: "Open", service: "Siemens S7" },
 ];
 
 const SAMPLE_STATISTICS = [
-  { label: "开放端口", value: 6 },
-  { label: "TCP 服务", value: 4 },
-  { label: "UDP 服务", value: 2 },
+  { label: "Open ports", value: 6 },
+  { label: "TCP services", value: 4 },
+  { label: "UDP services", value: 2 },
 ];
 
 const SAMPLE_FINGERPRINT = {
   os: "Embedded Linux (kernel 4.19)",
   technologies: [
-    { name: "OpenSSH", version: "8.4p1", category: "远程管理" },
-    { name: "nginx", version: "1.22", category: "Web 服务" },
-    { name: "Siemens S7", version: "V5.6", category: "工业控制" },
+    { name: "OpenSSH", version: "8.4p1", category: "Remote Management" },
+    { name: "nginx", version: "1.22", category: "Web Services" },
+    { name: "Siemens S7", version: "V5.6", category: "Industrial Control" },
   ],
 };
 
 const SAMPLE_RECOGNITION = {
-  primary: "工业网关 / 路由器",
+  primary: "Industrial Gateway / Router",
   confidence: 0.87,
   secondary: [
-    { type: "工业控制器", score: 0.65 },
-    { type: "边缘计算节点", score: 0.42 },
+    { type: "Industrial Controller", score: 0.65 },
+    { type: "Edge Computing Node", score: 0.42 },
   ],
   metadata: {
     manufacturer: "Siemens",
-    productLine: "Scalance M 系列",
+    productLine: "Scalance M Series",
     firmware: "V8.2.1",
     serial: "SCM-38210",
   },
@@ -288,45 +288,45 @@ const VULNERABILITY_DATA = [
     cve: "CVE-2023-12345",
     severity: "high",
     score: 8.8,
-    description: "某些 Scalance 设备中的身份验证绕过漏洞，可导致未授权访问。",
+    description: "An authentication bypass vulnerability in certain Scalance devices could allow unauthorized access.",
     published: "2023-11-18",
     exploit: "PoC",
-    deviceTypes: ["工业网关 / 路由器", "industrial router"],
+    deviceTypes: ["Industrial Gateway / Router", "industrial router"],
   },
   {
     cve: "CVE-2022-55678",
     severity: "medium",
     score: 6.5,
-    description: "nginx HTTP/2 模块在特定条件下可能导致拒绝服务。",
+    description: "The nginx HTTP/2 module can trigger a denial of service under specific conditions.",
     published: "2022-08-01",
-    exploit: "暂无",
+    exploit: "Not available",
     deviceTypes: ["nginx", "web server"],
   },
   {
     cve: "CVE-2021-9876",
     severity: "low",
     score: 4.3,
-    description: "OpenSSH 在弱配置下可能允许信息泄露，需要特定环境。",
+    description: "OpenSSH may allow information disclosure under weak configurations in specific environments.",
     published: "2021-04-12",
-    exploit: "暂无",
+    exploit: "Not available",
     deviceTypes: ["openssh", "remote management"],
   },
 ];
 
 const ANALYSIS_DATA = [
   {
-    deviceType: "工业网关 / 路由器",
+    deviceType: "Industrial Gateway / Router",
     cpe: "cpe:/o:siemens:scalance_m745",
-    relationship: "资产类型",
+    relationship: "Asset type",
   },
   {
-    deviceType: "工业控制器",
+    deviceType: "Industrial Controller",
     cpe: "cpe:/a:siemens:wincc:8.1",
-    relationship: "配套软件",
+    relationship: "Companion software",
   },
   {
-    deviceType: "边缘计算节点",
+    deviceType: "Edge Computing Node",
     cpe: "cpe:/h:siemens:industrial_edge",
-    relationship: "备选方案",
+    relationship: "Alternative",
   },
 ];

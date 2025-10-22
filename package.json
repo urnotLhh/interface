@@ -1,7 +1,7 @@
 {
   "name": "interface",
   "version": "1.0.0",
-  "description": "漏洞评估平台前端原型，包含可运行的演示服务",
+  "description": "Front-end prototype for a vulnerability assessment platform with a runnable demo service",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {

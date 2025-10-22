@@ -1,34 +1,35 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>脆弱性评估平台前端界面</title>
+    <title>Vulnerability Assessment Platform Interface</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="page-wrapper">
       <header class="page-header">
         <div class="branding">
-          <h1>脆弱性评估平台</h1>
-          <p class="subtitle">IP扫描 · 指纹收集 · 设备识别 · 漏洞评估</p>
+          <h1>Vulnerability Assessment Platform</h1>
+          <p class="subtitle">
+            IP Scanning · Fingerprint Collection · Device Identification · Vulnerability
+            Assessment
+          </p>
         </div>
         <div class="status-panel" id="statusPanel">
           <span class="status-dot" aria-hidden="true"></span>
-          <span id="statusText">等待操作</span>
+          <span id="statusText">Awaiting action</span>
         </div>
       </header>
 
       <main class="dashboard-grid">
-        <section
-          class="card ip-assessment"
-          aria-labelledby="device-scan-title"
-        >
+        <section class="card ip-assessment" aria-labelledby="device-scan-title">
           <div class="card-header">
             <div>
-              <h2 id="device-scan-title">设备扫描与识别</h2>
+              <h2 id="device-scan-title">Device Scanning &amp; Identification</h2>
               <p class="description">
-                输入目标范围后立即执行扫描，并集中查看识别结果与统计信息。
+                Provide a target range to start the scan immediately and review recognition
+                results alongside summary statistics.
               </p>
             </div>
           </div>
@@ -41,62 +42,58 @@
                 enctype="multipart/form-data"
               >
                 <fieldset class="mode-selector">
-                  <legend class="visually-hidden">选择评估方式</legend>
+                  <legend class="visually-hidden">Select assessment mode</legend>
                   <label class="mode-option">
-                    <input
-                      type="radio"
-                      name="assessmentMode"
-                      value="single"
-                      checked
-                    />
-                    单个 IP
+                    <input type="radio" name="assessmentMode" value="single" checked />
+                    Single IP
                   </label>
                   <label class="mode-option">
                     <input type="radio" name="assessmentMode" value="subnet" />
-                    子网 + 掩码
+                    Subnet + Mask
                   </label>
                   <label class="mode-option">
                     <input type="radio" name="assessmentMode" value="file" />
-                    上传文件
+                    Upload File
                   </label>
                 </fieldset>
                 <div class="mode-panels">
                   <div class="mode-panel" data-mode-panel="single">
-                    <label for="targetIp">目标 IP 地址</label>
+                    <label for="targetIp">Target IP Address</label>
                     <input
                       type="text"
                       id="targetIp"
                       name="targetIp"
-                      placeholder="例如：192.168.1.10"
+                      placeholder="Example: 192.168.1.10"
                       required
                       pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
                     />
                   </div>
                   <div class="mode-panel" data-mode-panel="subnet" hidden>
-                    <label for="targetSubnet">子网地址</label>
+                    <label for="targetSubnet">Subnet Address</label>
                     <input
                       type="text"
                       id="targetSubnet"
                       name="targetSubnet"
-                      placeholder="例如：10.0.0.0"
+                      placeholder="Example: 10.0.0.0"
                       required
                       pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$"
                     />
-                    <label for="targetMask">掩码 / 前缀</label>
+                    <label for="targetMask">Mask / Prefix</label>
                     <input
                       type="text"
                       id="targetMask"
                       name="targetMask"
-                      placeholder="255.255.255.0 或 24"
+                      placeholder="255.255.255.0 or 24"
                       required
                       pattern="^(([0-9]{1,3}\.){3}[0-9]{1,3})$|^([0-9]|[12][0-9]|3[0-2])$"
                     />
                     <small class="muted">
-                      支持传统掩码或 CIDR 前缀格式，示例：<code>192.168.10.0 / 24</code>
+                      Supports either a traditional subnet mask or a CIDR prefix, for
+                      example <code>192.168.10.0 / 24</code>.
                     </small>
                   </div>
                   <div class="mode-panel" data-mode-panel="file" hidden>
-                    <label for="targetFile">上传 IP 列表文件</label>
+                    <label for="targetFile">Upload IP List File</label>
                     <input
                       type="file"
                       id="targetFile"
@@ -105,24 +102,21 @@
                       required
                     />
                     <small class="muted">
-                      每行或以逗号分隔一个 IP / 子网，可自动跳过空行。
+                      Provide one IP/subnet per line or comma-separated. Empty lines are
+                      ignored automatically.
                     </small>
                   </div>
                 </div>
                 <div class="form-actions">
-                  <button type="submit" class="primary">开始评估</button>
-                  <button type="button" id="resetButton" class="ghost">
-                    清空结果
-                  </button>
+                  <button type="submit" class="primary">Start Assessment</button>
+                  <button type="button" id="resetButton" class="ghost">Clear Results</button>
                 </div>
               </form>
             </div>
             <div class="assessment-side">
               <div class="sub-card">
-                <h3 id="device-recognition-title">设备识别</h3>
-                <div id="deviceRecognition" class="placeholder">
-                  等待识别结果
-                </div>
+                <h3 id="device-recognition-title">Device Recognition</h3>
+                <div id="deviceRecognition" class="placeholder">Waiting for recognition results</div>
               </div>
             </div>
           </div>
@@ -131,57 +125,55 @@
         <section class="card neo4j-vuln-panel" aria-labelledby="neo4j-title">
           <div class="card-header">
             <div>
-              <h2 id="neo4j-title">漏洞库评估结果</h2>
+              <h2 id="neo4j-title">Vulnerability Database Assessment</h2>
             </div>
           </div>
           <div class="neo4j-vuln-body">
             <div class="neo4j-visual-block sub-card">
-              <h3>Neo4j漏洞库</h3>
+              <h3>Neo4j Vulnerability Library</h3>
               <div id="neo4jPreview" class="neo4j-preview placeholder">
-                正在查找 Neo4j 图谱图片
+                Searching for Neo4j graph image
               </div>
             </div>
             <div class="neo4j-eval-block">
               <form id="vulnForm" class="neo4j-inline-form" autocomplete="off">
-                <label class="visually-hidden" for="deviceTypes">
-                  设备名称或型号
-                </label>
+                <label class="visually-hidden" for="deviceTypes">Device name or model</label>
                 <div class="neo4j-input-row">
                   <input
                     type="text"
                     id="deviceTypes"
                     name="deviceTypes"
-                    placeholder="输入设备名称或型号"
+                    placeholder="Enter a device name or model"
                   />
-                  <button type="submit" class="primary">检索</button>
+                  <button type="submit" class="primary">Search</button>
                   <button type="button" id="useRecognizedDevices" class="ghost">
-                    扫描结果评估
+                    Assess from scan results
                   </button>
                 </div>
                 <span id="vulnTime" class="muted"></span>
               </form>
               <div class="scan-eval-section sub-card">
                 <div class="scan-eval-header">
-                  <h3>扫描结果评估</h3>
+                  <h3>Scan Result Assessment</h3>
                   <button type="button" class="secondary" id="downloadReport">
-                    下载漏洞评估报告
+                    Download vulnerability assessment report
                   </button>
                 </div>
                 <div class="scan-eval-stats">
                   <div class="scan-eval-stat critical">
-                    <span class="label">CRITICAL（严重）</span>
+                    <span class="label">CRITICAL (Severe)</span>
                     <span class="value">13</span>
                   </div>
                   <div class="scan-eval-stat high">
-                    <span class="label">HIGH（高）</span>
+                    <span class="label">HIGH (High)</span>
                     <span class="value">28</span>
                   </div>
                   <div class="scan-eval-stat medium">
-                    <span class="label">MEDIUM（中等）</span>
+                    <span class="label">MEDIUM (Moderate)</span>
                     <span class="value">28</span>
                   </div>
                   <div class="scan-eval-stat low">
-                    <span class="label">LOW（低）</span>
+                    <span class="label">LOW (Low)</span>
                     <span class="value">164</span>
                   </div>
                 </div>
@@ -192,7 +184,7 @@
       </main>
 
       <footer class="page-footer">
-        <small>© 2025 脆弱性评估平台 · 前端界面原型</small>
+        <small>© 2025 Vulnerability Assessment Platform · Front-end prototype</small>
       </footer>
     </div>
 
