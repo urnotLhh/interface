@@ -1,9 +1,9 @@
 version: 1
-project: 漏洞评估平台前端界面
+project: Vulnerability Assessment Platform Interface
 steps:
-  - name: 安装依赖
+  - name: Install dependencies
     command: npm install
-    description: 安装 Express、Multer 等运行示例服务所需的依赖。
-  - name: 启动演示服务
+    description: Install Express, Multer, and other dependencies required for the demo service.
+  - name: Start the demo service
     command: npm start
-    description: 在本地端口 5173 启动前端页面和演示 API。
+    description: Launch the front-end page and demo APIs on local port 5173.

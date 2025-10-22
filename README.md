@@ -1,68 +1,68 @@
-# 漏洞评估平台前端界面
+# Vulnerability Assessment Platform Interface
 
-本项目是一个聚合 IP 扫描、指纹收集、设备识别与漏洞评估的前端原型，提供统一入口展示和操作入口。界面支持演示数据，也可以连接真实后端 API，并附带一个轻量级本地服务用于演示和二次开发。
+This project provides a front-end prototype that brings together IP scanning, fingerprint collection, device recognition, and vulnerability assessment in a single dashboard. It ships with demo data, but you can also connect it to real APIs. A lightweight local server is included to support demos and quick iteration.
 
-## 功能概览
+## Feature overview
 
-- **目标 IP 评估**：支持三种入口——单个 IP、子网 + 掩码、IP 列表文件上传。提交后自动串联扫描、指纹和识别工作流，并生成统计指标与目标概要。
-- **漏洞检索**：支持针对一个或多个设备类型发起漏洞搜索，展示 CVE 列表并统计耗时。
-- **漏洞分析**：展示设备类型与 CPE 的映射关系，辅助进一步分析。
-- **Neo4j 嵌入**：可直接嵌入本地 Neo4j 浏览器（默认指向 `http://localhost:7474/browser/`），或上传示例图像进行展示。
+- **Target assessment** – Submit a single IP, a subnet + mask, or an uploaded list of addresses. The workflow chains scanning, fingerprinting, and recognition while producing summary metrics.
+- **Vulnerability search** – Query the vulnerability catalog for one or more device types and review the resulting CVE list, including timing statistics.
+- **Vulnerability analysis** – Visualize the mapping between device types and CPE identifiers to assist deeper investigations.
+- **Neo4j integration** – Embed the local Neo4j browser (defaults to `http://localhost:7474/browser/`) or display an exported reference image.
 
-## 运行前准备
+## Prerequisites
 
-在开始前，请确保本地环境满足以下条件：
+Ensure the following tools are available locally:
 
-- [Node.js](https://nodejs.org/) **16.x** 或更高版本（项目在 LTS 版本上验证通过）。
-- `npm`（随 Node.js 一起安装）用于管理依赖。
+- [Node.js](https://nodejs.org/) **16.x** or later (verified on LTS releases).
+- `npm` (bundled with Node.js) for dependency management.
 
-安装完 Node.js 后，在项目根目录执行依赖安装：
+Install dependencies from the project root:
 
 ```bash
 npm install
 ```
 
-命令会安装 `express` 与 `multer` 等后端演示服务所需依赖。
+The command installs `express`, `multer`, and other dependencies required by the demo backend service.
 
-## 本地运行
+## Run locally
 
-完成依赖安装后，启动内置演示服务：
+Start the bundled demo service after installing dependencies:
 
 ```bash
 npm start
 ```
 
-启动后访问 [http://localhost:5173](http://localhost:5173) 即可体验完整界面。右上角的“使用演示数据”开关用于在前端内置数据与真实接口之间切换。
+Open [http://localhost:5173](http://localhost:5173) in your browser to explore the interface. The "Use demo data" toggle in the top-right corner switches between built-in data and real API responses.
 
-## 接口约定
+## API contracts
 
-若切换到真实接口模式，请确保后端提供下列能力：
+When connecting to a real backend, implement the following endpoints:
 
 - `POST /api/assessment`
-  - 单个 IP：`{ "type": "single", "ip": "192.168.1.10" }`
-  - 子网：`{ "type": "subnet", "subnet": "10.0.0.0", "mask": "24" }`
-  - 文件上传：`multipart/form-data`，字段 `type=file` 与 `targetsFile=<文件>`，文件支持逐行或逗号分隔的 IP/子网。
-  - 返回值需包含扫描概览、指纹识别、识别信息、统计数组，以及一个 `summary` 字段，用于描述目标范围和示例。
+  - Single IP: `{ "type": "single", "ip": "192.168.1.10" }`
+  - Subnet: `{ "type": "subnet", "subnet": "10.0.0.0", "mask": "24" }`
+  - File upload: `multipart/form-data` with `type=file` and `targetsFile=<file>` containing line- or comma-separated IPs/subnets.
+  - Response should include a scan overview, fingerprint data, recognition details, statistics, and a `summary` object describing the assessed scope.
 - `POST /api/vulnerabilities`
-  - 请求体：`{ "deviceTypes": ["Industrial Router", "PLC Controller"] }`
-  - 返回值：`{ vulnerabilities: [...], analysis: [...] }`，其中 analysis 为设备类型与 CPE 的映射。
-- （可选）`POST /api/cpe-mapping`
-  - 若希望拆分分析接口，可单独返回 CPE 映射，前端提供常量 `API_ENDPOINTS.analysis` 以供调整。
+  - Request body: `{ "deviceTypes": ["Industrial Router", "PLC Controller"] }`
+  - Response: `{ vulnerabilities: [...], analysis: [...] }`, where `analysis` lists device-to-CPE mappings.
+- (Optional) `POST /api/cpe-mapping`
+  - Use this endpoint if you want to split the analysis API. Adjust `API_ENDPOINTS.analysis` in `app.js` accordingly.
 
-如需调整接口路径，可修改 `app.js` 中的 `API_ENDPOINTS` 常量。
+Update the `API_ENDPOINTS` constant in `app.js` if you need to customize routes.
 
-## Neo4j 图谱展示
+## Neo4j visualization
 
-- 默认以 iframe 方式嵌入本地 Neo4j 浏览器，如需访问请确保浏览器允许访问 `http://localhost:7474`。
-- 若由于安全策略无法嵌入，可切换到“使用示例图片”模式，并上传一张导出的节点关联图作为示例。
+- By default the page embeds the local Neo4j browser; ensure your browser can access `http://localhost:7474`.
+- If embedding is blocked by security policies, switch to an uploaded sample image exported from Neo4j.
 
-## 自定义与扩展
+## Customization and extension
 
-- 可根据实际后端 API 的返回结构，调整 `app.js` 中 `renderAssessment`、`renderVulnerabilities` 和 `renderAnalysis` 的解析逻辑。
-- 样式集中在 `styles.css`，可继续扩展主题、响应式布局或深色/浅色模式。
-- 若需要国际化，可将界面文本抽取为配置文件或接入 i18n 库。
+- Modify the parsing logic in `app.js` (`renderAssessment`, `renderVulnerabilities`, `renderAnalysis`) to match your backend payloads.
+- Styles live in `styles.css`. Extend the theme, add responsive breakpoints, or implement dark/light modes as needed.
+- For internationalization, extract interface text into a config file or integrate an i18n library.
 
-## 数据准备建议
+## Data preparation tips
 
-- 文件上传支持 `.txt`、`.csv` 等纯文本格式，建议一行一个目标或使用逗号分隔。
-- 若对接真实扫描结果，可在 `summary` 字段中返回总目标数、示例 IP，以及描述信息，以增强前端展示体验。
+- File uploads accept plain-text `.txt` or `.csv` files. Use one target per line or comma-separated values.
+- When returning real scan results, populate the `summary` object with the total number of targets, sample addresses, and descriptive context to enrich the presentation.
